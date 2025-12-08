@@ -36,6 +36,8 @@ class Task(models.Model):
     xp_reward = models.IntegerField(default=50)
     xp_penalty = models.IntegerField(default=20)
     
+    is_completed = models.BooleanField(default=False)
+    
     
     available_from = models.DateTimeField(null=True, blank=True, help_text="Inizio finestra temporale")
 
@@ -45,7 +47,8 @@ class Task(models.Model):
     max_users = models.IntegerField(default=1, help_text="Quante persone possono prendere questa task")
     
     def __str__(self):
-        return f"{self.title} (Scade: {self.deadline})"
+        status = "✓" if self.is_completed else "✗"
+        return f"{status} {self.title} (Scade: {self.deadline})"
 
 
 # Obiettivi secondari
@@ -53,8 +56,11 @@ class SubTask(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='subtasks')
     description = models.CharField(max_length=200, help_text="Es. Pulire il lavandino")
     
+    is_completed = models.BooleanField(default=False)
+    
     def __str__(self):
-        return self.description
+        status = "✓" if self.is_completed else "✗"
+        return f"{status} {self.description}"
 
 
 # Compito assegnato
