@@ -1,24 +1,23 @@
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css'; // Importiamo Bootstrap
+
+
+import Menubar from './components/Menubar';
+import Dashboard from './pages/Dashboard';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      {/* La Menubar sta FUORI dalle Routes così rimane fissa in tutte le pagine */}
+      <Menubar />
+      
+      <div className="container mt-3">
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          {/* Qui in futuro aggiungerai: <Route path="/login" element={<Login />} /> */}
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 }
 
