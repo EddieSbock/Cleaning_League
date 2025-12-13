@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import House, Profile, Task, SubTask, GameSession, Assignment
+from .models import House, Profile, Task, SubTask, GameSession, Assignment, Rating
 from django.contrib.auth.models import User
 
 
@@ -53,3 +53,24 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = '__all__'
         
         read_only_fields = ['total_xp', 'level', 'user'] #per non far modificare agli utenti
+        
+class RatingSerializer(serializers.ModelSerializer):
+
+    voter_details = serializers.ReadOnlyField(source='voter.nickname')
+    
+    class Meta:
+        model = Rating
+        fields = '__all__'
+    
+        read_only_fields = ['voter']
+        
+class AssignmentSerializer(serializers.ModelSerializer):
+    task_title = serializers.ReadOnlyField(source='task.title')
+    assignee_name = serializers.ReadOnlyField(source='assigned_to.nickname')
+    
+    ratings = RatingSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Assignment
+        fields = '__all__'
+        read_only_fields = ['earned_xp', 'completed_at', 'status'] 
