@@ -1,11 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import User
 import django.utils.timezone as timezone
-import uuid
+import random
+import string
+
+def generate_invite_code(length=8):
+    characters = string.ascii_letters + string.digits    
+    return ''.join(random.choice(characters) for _ in range(length))
 
 class House(models.Model):
     name = models.CharField(max_length=40, verbose_name="Nome Casa")
-    invite_code = models.CharField(max_length=10, unique=True, default=uuid.uuid4, editable=False)
+    invite_code = models.CharField(max_length=8, unique=True, default=generate_invite_code, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     
     # Amministratore della casa
@@ -30,7 +35,7 @@ class Profile(models.Model):
     
 class GameSession(models.Model):
     house = models.ForeignKey(House, on_delete=models.CASCADE, related_name='sessions')
-    name = models.CharField(max_length=100, default="Sessione di Pulizie")
+    name = models.CharField(max_length=50, default="Sessione di Pulizie")
     
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
