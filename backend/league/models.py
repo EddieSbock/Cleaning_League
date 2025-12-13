@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 import django.utils.timezone as timezone
 import random
 import string
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 def generate_invite_code(length=8):
     characters = string.ascii_letters + string.digits    
@@ -92,9 +93,7 @@ class Assignment(models.Model):
     STATUS_CHOICES = [
         ('TODO', 'Da Fare'),
         ('IN_PROGRESS', 'In Corso'),
-        ('COMPLETED', 'Completata (Attesa Conferma)'),
-        ('VERIFIED', 'Verificata (Punti Assegnati)'),
-        ('FAILED', 'Fallita (Malus)'),
+        ('COMPLETED', 'Completata'),
     ]
 
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
@@ -103,9 +102,8 @@ class Assignment(models.Model):
     
     created_at = models.DateTimeField(auto_now_add=True)
     started_at = models.DateTimeField(null=True, blank=True)
-    completed_at = models.DateTimeField(null=True, blank=True)
     
-    verified_by = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, related_name='verifications')
+    completed_at = models.DateTimeField(null=True, blank=True)
     
     earned_xp = models.IntegerField(default=0, help_text="Punti finali calcolati")
 
@@ -115,19 +113,44 @@ class Assignment(models.Model):
             return 0
             
         session = self.task.session
+        now = timezone.now()
         
-        if self.completed_at > session.end_time:
-            return 0 # Nessun bonus se completato dopo la fine della sessione
+        score = self.task.xp_reward
+        
+        if now <= session.end_time:
+            total_duration = (session.end_time - session.start_time).total_seconds()
+        
+            time_elapsed = (now - session.start_time).total_seconds()
+            time_elapsed = max(0, time_elapsed)
             
-        total_duration = (session.end_time - session.start_time).total_seconds()
-        time_elapsed = (self.completed_at - session.start_time).total_seconds() # Tempo passato 
         
-        time_elapsed = max(0, time_elapsed)
+            fraction_left = 1 - (time_elapsed / total_duration)
+            fraction_left = max(0, fraction_left)
+            
+            bonus = int(session.max_speed_bonus * fraction_left)
+            score = score + bonus
         
-        fraction_left = 1 - (time_elapsed / total_duration)# Per calcolare la frazione di tempo rimasta
-        
-        bonus = int(session.max_speed_bonus * fraction_left)
-        return max(0, bonus)
+        self.earned_xp = score
+        self.completed_at = now
+        self.status = 'COMPLETED'
+        self.save()
+        return score
 
     def __str__(self):
         return f"{self.task.title} -> {self.assigned_to.nickname}"
+    
+class Rating(models.Model):
+    
+    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='ratings')
+    voter = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='votes_given')
+    
+    stars = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    comment = models.TextField(blank=True, help_text="Opzionale: commento sulla pulizia")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+
+        unique_together = ('assignment', 'voter') #un utente può votare una singola volta per assignment
+
+    def __str__(self):
+        return f"{self.voter.nickname} ha dato {self.stars} stelle a {self.assignment.task.title}"
