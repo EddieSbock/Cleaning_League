@@ -12,8 +12,9 @@ function Register() {
     e.preventDefault();
     try {
       await authService.register(username, email, password);
-      alert("Registrazione avvenuta con successo! Effettuare login");
-      navigate('/login');
+      await authService.login(username, password); //serve per fare l'auto-login
+      alert("Registrazione avvenuta con successo! Benvenuto in Cleaning League !");
+      navigate('/');
     } catch (err) {
       alert("Errore. Username già utilizzato");
     }
