@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import django.utils.timezone as timezone
 import uuid
 
 class House(models.Model):
@@ -26,18 +27,36 @@ class Profile(models.Model):
     
     def __str__(self):
         return self.nickname if self.nickname else self.user.username
+    
+class GameSession(models.Model):
+    house = models.ForeignKey(House, on_delete=models.CASCADE, related_name='sessions')
+    name = models.CharField(max_length=100, default="Sessione di Pulizie")
+    
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    
+    max_speed_bonus = models.IntegerField(default=50, help_text="Bonus massimo all'inizio della sessione")
+    
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.name} ({self.start_time.strftime('%H:%M')} - {self.end_time.strftime('%H:%M')})"
+
+    @property
+    def duration_hours(self):
+        diff = self.end_time - self.start_time #calcola quanto dura la sessione in ore
+        return diff.total_seconds() / 3600
 
 
 class Task(models.Model):
-    house = models.ForeignKey(House, on_delete=models.CASCADE, related_name='tasks')
+    session = models.ForeignKey(GameSession, on_delete=models.CASCADE, related_name='tasks')
+    
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     
     xp_reward = models.IntegerField(default=50)
-    xp_penalty = models.IntegerField(default=20)
     
     is_completed = models.BooleanField(default=False)
-    
     
     available_from = models.DateTimeField(null=True, blank=True, help_text="Inizio finestra temporale")
 
@@ -82,6 +101,28 @@ class Assignment(models.Model):
     completed_at = models.DateTimeField(null=True, blank=True)
     
     verified_by = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, related_name='verifications')
+    
+    earned_xp = models.IntegerField(default=0, help_text="Punti finali calcolati")
+
+    def calculate_bonus(self):
+
+        if not self.completed_at:
+            return 0
+            
+        session = self.task.session
+        
+        if self.completed_at > session.end_time:
+            return 0 # Nessun bonus se completato dopo la fine della sessione
+            
+        total_duration = (session.end_time - session.start_time).total_seconds()
+        time_elapsed = (self.completed_at - session.start_time).total_seconds() # Tempo passato 
+        
+        time_elapsed = max(0, time_elapsed)
+        
+        fraction_left = 1 - (time_elapsed / total_duration)# Per calcolare la frazione di tempo rimasta
+        
+        bonus = int(session.max_speed_bonus * fraction_left)
+        return max(0, bonus)
 
     def __str__(self):
         return f"{self.task.title} -> {self.assigned_to.nickname}"
