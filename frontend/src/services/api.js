@@ -9,4 +9,18 @@ const api = axios.create({
   }
 });
 
+api.interceptors.request.use( //è fondamentale, senza di questo si verificano errori per l'accesso.
+  (config) => {
+    const token = localStorage.getItem('userToken');
+    if (token) {
+      config.headers.Authorization = `Token ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 export default api;
+
