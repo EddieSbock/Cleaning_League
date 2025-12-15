@@ -14,8 +14,9 @@ function Register() {
       await authService.register(username, email, password);
       await authService.login(username, password); //serve per fare l'auto-login
       alert("Registrazione avvenuta con successo! Benvenuto in Cleaning League !");
-      navigate('/');
+      window.location.href="/"; //così rimanda direttamente alla scelta della casa
     } catch (err) {
+      console.error(err);
       alert("Errore. Username già utilizzato");
     }
   };
