@@ -16,10 +16,21 @@ class SubTaskSerializer(serializers.ModelSerializer):
 class TaskSerializer(serializers.ModelSerializer):
     
     subtasks = SubTaskSerializer(many=True, read_only=True) # Include le subtask nel serializer principale
+    
+    taken_seats = serializers.IntegerField(source='assignments.count', read_only=True)
+    is_taken_by_me = serializers.SerializerMethodField()
 
     class Meta:
         model = Task
         fields = '__all__'
+        
+    def get_is_taken_by_me(self, obj):
+    
+        request = self.context.get('request')
+        if request and hasattr(request.user, 'profile'):
+        
+            return obj.assignments.filter(assigned_to=request.user.profile).exists()
+        return False
         
 class GameSessionSerializer(serializers.ModelSerializer):
 

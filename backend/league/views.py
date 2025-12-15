@@ -16,6 +16,33 @@ class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     
+    @action(detail=True, methods=['post'])
+    def grab(self, request, pk=None):
+        task = self.get_object()
+        user_profile = request.user.profile # user che fa la richiesta
+        
+        # controlla se la sessione é attiva
+        if not task.session.is_active:
+             return Response({'error': 'La sessione è chiusa o scaduta!'}, status=400)
+
+        # constolla se l'user ha gi preso la task
+        already_assigned = Assignment.objects.filter(task=task, assigned_to=user_profile).exists()
+        if already_assigned:
+            return Response({'error': 'Hai già preso questa task!'}, status=400)
+            
+        # controlla se ci sono posti disponibili
+        current_takers = Assignment.objects.filter(task=task).count()
+        if current_takers >= task.max_assignees:
+            return Response({'error': 'Posti esauriti per questa task!'}, status=400)
+
+        Assignment.objects.create(
+            task=task,
+            assigned_to=user_profile,
+            status='TODO'
+        )
+        
+        return Response({'status': 'Task assegnata con successo!'})
+    
 class GameSessionViewSet(viewsets.ModelViewSet):
     queryset = GameSession.objects.all()
     serializer_class = GameSessionSerializer
