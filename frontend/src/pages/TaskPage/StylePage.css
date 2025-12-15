@@ -1,0 +1,127 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #1a1a2e; 
+    color: #fff;
+    margin: 0;
+    padding: 20px;
+    height: 100vh;
+    overflow: hidden; 
+}
+
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    max-width: 70%; 
+    padding-top: 50px;
+}
+
+/*Definizione carta*/
+.task-card {
+    background: linear-gradient(145deg, #16213e, #0f3460);
+    border: 1px solid #533483;
+    border-radius: 10px;
+    padding: 15px;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+    z-index: 1;
+}
+
+.task-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 15px #e94560;
+}
+
+.task-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 10px; color: #e94560; }
+.task-xp { font-weight: bold; color: #ffd700; float: right; }
+.task-dates { font-size: 0.8rem; color: #aaa; display: block; margin-top: 10px; }
+
+/*CARTA SELEZIONATA (Vola in alto a destra) */
+
+.task-card.active-selection {
+    position: fixed;
+    top: 120px;     
+    right: 320px;   
+    width: 200px;
+    z-index: 100;
+    transform: scale(1.1);
+    box-shadow: 0 0 25px rgba(233, 69, 96, 0.8);
+    pointer-events: none; 
+    transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Effetto rimbalzo */
+}
+
+/*CARTA ACCETTATA (Vola in basso a destra)*/
+.task-card.accepted-anim {
+    position: fixed;
+    top: auto;
+    bottom: 50px;
+    right: 50px;
+    transform: scale(0); 
+    opacity: 0;
+    transition: all 0.8s ease-in;
+}
+
+/* --- IL MONITOR (Dettagli) --- */
+.monitor-panel {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 280px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #00fff5;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 255, 245, 0.2);
+    backdrop-filter: blur(5px);
+    transition: opacity 0.3s;
+}
+
+.monitor-panel.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.btn-action {
+    background: #00fff5;
+    color: #000;
+    border: none;
+    padding: 10px;
+    width: 100%;
+    margin-top: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-secondary {
+    background: transparent;
+    color: #fff;
+    border: 1px solid #fff;
+    width: 100%;
+    margin-top: 5px;
+    cursor: pointer;
+}
+
+
+.inventory-box {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 300px;
+    height: 150px;
+    background: #1a1a2e;
+    border: 2px dashed #533483;
+    border-radius: 10px;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+
+.mini-card {
+    background: #0f3460;
+    padding: 5px;
+    margin-bottom: 5px;
+    border-left: 3px solid #00fff5;
+    font-size: 0.8rem;
+}

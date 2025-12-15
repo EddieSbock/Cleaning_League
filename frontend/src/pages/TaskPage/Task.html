@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bacheca Missioni</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>Bacheca Missioni</h1>
+        <p>Scegli la tua prossima sfida</p>
+    </header>
+
+    <div id="task-grid" class="grid-container">
+        </div>
+
+    <div id="detail-monitor" class="monitor-panel hidden">
+        <h2 id="monitor-title">Titolo Task</h2>
+        <div class="monitor-body">
+            <p id="monitor-desc">Descrizione dettagliata...</p>
+            <div class="monitor-stats">
+                <span id="monitor-xp">XP</span>
+                <span id="monitor-dates">Date</span>
+                <span id="monitor-slots">Posti</span>
+            </div>
+            <button id="accept-btn" class="btn-action">ACCETTA MISSIONE</button>
+            <button id="close-btn" class="btn-secondary">CHIUDI</button>
+        </div>
+    </div>
+
+    <div id="user-inventory" class="inventory-box">
+        <h3>Le tue Missioni</h3>
+        <div id="accepted-tasks-container" class="mini-cards-container">
+            </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
