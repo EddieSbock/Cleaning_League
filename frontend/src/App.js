@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css'; // Importiamo Bootstrap
 import './App.css';
 
@@ -11,7 +11,6 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import HomePage from './pages/HomePage';
 import HouseSelection from './pages/HouseSelection';
-
 import authService from './services/auth';
 
 
@@ -49,9 +48,9 @@ function App() {
           <Route 
             path="/dashboard" 
             element={
-              <HouseRoute>
+              <PrivateRoute requiresHous={true}>
                 <Dashboard />
-              </HouseRoute>
+              </PrivateRoute>
             } 
           />
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import authService from '../services/auth';
 
-const ProtectedRoute = ({ requiresHouse=false, protectedComponent}) => {
+const PrivateRoute = ({ requiresHouse=false, protectedComponent}) => {
   const user = authService.getCurrentUser(); //controlla se ha il token
   const hasHouse = authService.hasHouse(); 
 
@@ -15,6 +15,10 @@ const ProtectedRoute = ({ requiresHouse=false, protectedComponent}) => {
     //in caso non abbia una "casa" si va alla schermata di selezione e creazione.
     return <Navigate to="/house-selection" />;
   }
+
+  if (!requiresHouse && hasHouse) { //se ha una casa manda direttamente alla dashboard
+    return <Navigate to="/dashboard" />;
+  } 
 
 
   //accesso libero a tutti gli utenti già registrati
