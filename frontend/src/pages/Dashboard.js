@@ -106,7 +106,7 @@ const Dashboard = () => {
   const handleGrabTask = async (taskId) => {
     try {
       await api.post(`tasks/${taskId}/grab/`);
-      alert("Task presa! Al lavoro! 🧹");
+      alert("Task presa!");
       setView('mine');
       if(session) refreshTasks(session.id);
     } catch (error) {
