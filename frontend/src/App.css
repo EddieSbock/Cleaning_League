@@ -1,38 +1,96 @@
-.App {
-  text-align: center;
+
+:root {
+  --primary-color: #4e54c8;  
+  --secondary-color: #8f94fb; 
+  --accent-color: #4b0c43;    
+  --bg-color: #f4f7f6;        
+  --card-bg: #ffffff;
+  --text-dark: #333333;
+  --text-light: #ffffff;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+
+body {
+  background-color: var(--bg-color);
+  font-family: 'Segoe UI', 'Roboto', sans-serif; 
+  color: var(--text-dark);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  z-index: -1;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+
+.card {
+  border: none !important; /* Via il bordo grigio triste di Bootstrap */
+  border-radius: 15px !important;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.05); /* Ombra morbida */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
 }
 
-.App-link {
-  color: #61dafb;
+
+.card:hover {
+  transform: translateY(-5px); /* La card si alza leggermente */
+  box-shadow: 0 15px 30px rgba(0,0,0,0.1);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+
+.btn-primary {
+  background: linear-gradient(to right, var(--primary-color), var(--secondary-color)) !important;
+  border: none !important;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 30px !important; /* Bottoni arrotondati */
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+
+.form-control {
+  background-color: #f9f9f9;
+  border: 2px solid #eee;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.form-control:focus {
+  background-color: #fff;
+  border-color: var(--primary-color);
+  box-shadow: none;
+}
+
+
+.menubar {
+  background: linear-gradient(to right, #4e54c8, #8f94fb) !important;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.meniubar-brand {
+  font-weight: bold;
+  font-size: 1.5rem;
+  letter-spacing: 1px;
+}
+
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out;
 }
