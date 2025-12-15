@@ -150,7 +150,7 @@ const Dashboard = () => {
                         <div className="avatar-circle">{m.nickname.charAt(0)}</div>
                         <div className="member-info">
                           <span className="name">{m.nickname}</span>
-                          <span className="level">Lvl. {member.level}</span>
+                          <span className="level">Lvl. {m.level}</span>
                         </div>
                     </li>
                 ))}
@@ -186,46 +186,47 @@ const Dashboard = () => {
             <div className="grid-layout">
                 
                 {/* per le task */}
-
-                <div className="card task-widget">
-                    <div className="tabs">
-                        <button className={view === 'available' ? 'active' : ''} onClick={() => setView('available')}>
-                            Da Fare
-                        </button>
-                        <button className={view === 'mine' ? 'active' : ''} onClick={() => setView('mine')}>
-                            Le Mie Task
-                        </button>
-                    </div>
-
-                    <div className="task-list-scroll">
-                        {view === 'available' ? (
-                            tasks.filter(t => !t.is_taken_by_me && t.taken_seats < t.max_assignees).map(task => (
-                                <div key={task.id} className="task-row">
-                                    <div>
-                                        <h4>{task.title}</h4>
-                                        <span className="xp-tag">💎 {task.xp_reward} XP</span>
-                                    </div>
-                                    <button className="btn-grab" onClick={() => handleGrabTask(task.id)}>Prendi</button>
-                                </div>
-                            ))
-                        ) : (
-                            myAssignments.map(assign => (
-                                <div key={assign.id} className="task-row mine">
-                                    <div>
-                                        <h4>Task #{assign.task}</h4> {/* inserire il titolo nel serializer */}
-                                        <small>In corso...</small>
-                                    </div>
-                                    <button className="btn-complete" onClick={() => handleCompleteTask(assign.id)}>Fatto! ✅</button>
-                                </div>
-                            ))
-                        )}
-                        {view === 'available' && tasks.length === 0 && <p style={{padding:20, color:'#999'}}>Nessuna task libera.</p>}
-                    </div>
+<div className="card task-widget-fixed">
+                <div className="widget-header">
+                    <h3>Le mie Task Attive</h3>
                 </div>
 
-                {/* 2. CLASSIFICA TOTALE "test"*/}
+                <div className="task-list-simple-scroll">
+                    {myAssignments.length > 0 ? (
+                        <ul>
+                            {myAssignments.map(assign => (
+                                <li key={assign.id} className="simple-task-item">
+                                    <div className="task-text">
+                                        <span className="t-title">{assign.task_title || `Task #${assign.task}`}</span>
+                                        <span className="t-status">In corso</span>
+                                    </div>
+                                    <button 
+                                        className="btn-check-mini" 
+                                        onClick={() => handleCompleteTask(assign.id)}
+                                        title="Segna come fatto"
+                                    >✓</button>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <div className="empty-state-text">
+                            <p>Non hai task in corso.</p>
+                            <small>Vai a prenderne una!</small>
+                        </div>
+                    )}
+                </div>
+
+                <button 
+                    className="btn-go-tasks" 
+                    onClick={() => navigate('/tasks')} 
+                >
+                    Cerca nuove Task →
+                </button>
+            </div>
+
+                {/* CLASSIFICA TOTALE "test"*/}
                 <div className="card total-leaderboard">
-                    <h3>👑 Classifica Casa</h3>
+                    <h3>Classifica Casa</h3>
                     <ul className="ranking-list">
                         {members.sort((a, b) => b.total_xp - a.total_xp).map((m, index) => (
                             <li key={m.id}>
