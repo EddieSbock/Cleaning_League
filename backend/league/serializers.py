@@ -19,6 +19,9 @@ class TaskSerializer(serializers.ModelSerializer):
     
     taken_seats = serializers.IntegerField(source='assignments.count', read_only=True)
     is_taken_by_me = serializers.SerializerMethodField()
+    session_start = serializers.DateTimeField(source='session.start_time', read_only=True)
+    session_end = serializers.DateTimeField(source='session.end_time', read_only=True)
+    
 
     class Meta:
         model = Task
