@@ -69,6 +69,8 @@ class RatingSerializer(serializers.ModelSerializer):
 
     voter_details = serializers.ReadOnlyField(source='voter.nickname')
     
+    stars = serializers.IntegerField(min_value=1, max_value=5)
+    
     class Meta:
         model = Rating
         fields = '__all__'
