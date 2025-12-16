@@ -12,6 +12,7 @@ import Register from './pages/Register';
 import HomePage from './pages/HomePage';
 import HouseSelection from './pages/HouseSelection';
 import authService from './services/auth';
+import TaskMarket from './pages/TaskPage/TaskMarket';
 
 
 function App() {
@@ -54,6 +55,12 @@ function App() {
                 <Dashboard />
               </PrivateRoute>
             } 
+          />
+
+{/* vavigate login impedisce a persone non registrate di accedere alle missioni */}
+          <Route 
+          path="/market"
+          element={user ? <TaskMarket /> : <Navigate to= '/login' />}
           />
 
         </Routes>
