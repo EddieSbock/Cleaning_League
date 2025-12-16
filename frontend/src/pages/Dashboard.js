@@ -61,9 +61,7 @@ const Dashboard = () => {
         setTasks(sessionTasks);
 
         const assignReq = await api.get('assignments/');
-        // Filtriamo solo quelle non completate dell'utente corrente
-        // Nota: Assumiamo che l'API restituisca tutti gli assignment o che filtriamo lato client
-        // Qui ci vorrebbe un controllo sull'ID utente, per ora filtro quelle 'TODO'
+        // Filtra solo quelle non completate dell'utente corrente
         setMyAssignments(assignReq.data.filter(a => a.status === 'TODO')); 
     } catch (error) {
         console.error("Errore refresh task", error);

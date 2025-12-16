@@ -12,7 +12,8 @@ import Register from './pages/Register';
 import HomePage from './pages/HomePage';
 import HouseSelection from './pages/HouseSelection';
 import authService from './services/auth';
-import TaskMarket from './pages/TaskPage/TaskMarket';
+import TaskMarket from './pages/TaskPage/TaskMarket'; 
+import ProfilePage from './pages/ProfilePage/ProfilePage';
 
 
 function App() {
@@ -61,6 +62,11 @@ function App() {
           <Route 
           path="/market"
           element={user ? <TaskMarket /> : <Navigate to= '/login' />}
+          />
+
+          <Route 
+          path="/profile" 
+          element={user ? <ProfilePage /> : <Navigate to="/login" />} 
           />
 
         </Routes>
