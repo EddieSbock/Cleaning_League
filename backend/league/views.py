@@ -1,8 +1,10 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, generics
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny
+from django.contrib.auth.models import User
 from .models import House, Profile, Task, GameSession, Assignment, Rating
-from .serializers import HouseSerializer, ProfileSerializer, TaskSerializer, GameSessionSerializer,AssignmentSerializer, RatingSerializer
+from .serializers import HouseSerializer, ProfileSerializer, TaskSerializer, GameSessionSerializer,AssignmentSerializer, RatingSerializer, RegisterSerializer
 
 class HouseViewSet(viewsets.ModelViewSet):
     queryset = House.objects.all()
@@ -108,3 +110,8 @@ class RatingViewSet(viewsets.ModelViewSet):
             serializer.save(voter=self.request.user.profile)
         else:
             serializer.save()
+            
+class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    permission_classes = (AllowAny,)
+    serializer_class = RegisterSerializer

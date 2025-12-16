@@ -1,6 +1,10 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import HouseViewSet, ProfileViewSet, TaskViewSet, GameSessionViewSet, AssignmentViewSet, RatingViewSet
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+from .views import HouseViewSet, ProfileViewSet, TaskViewSet, GameSessionViewSet, AssignmentViewSet, RatingViewSet, RegisterView
 
 router = DefaultRouter() #per crare automaticamente gli url delle altre pagine
 router.register(r'houses', HouseViewSet)
@@ -10,6 +14,10 @@ router.register(r'sessions', GameSessionViewSet)
 router.register(r'assignments', AssignmentViewSet)
 router.register(r'ratings', RatingViewSet)
 
+
 urlpatterns = [
     path('', include(router.urls)),
+    path('register/', RegisterView.as_view(), name='auth_register'),
+    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

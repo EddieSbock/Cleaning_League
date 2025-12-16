@@ -7,6 +7,21 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email']
+        
+class RegisterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'password', 'email',)
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def create(self, validated_data):
+        # Crea l'utente salvando la password criptata
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            password=validated_data['password'],
+            email=validated_data.get('email', ''),
+        )
+        return user
 
 class SubTaskSerializer(serializers.ModelSerializer):
     class Meta:
