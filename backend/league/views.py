@@ -7,8 +7,23 @@ from .models import House, Profile, Task, GameSession, Assignment, Rating
 from .serializers import HouseSerializer, ProfileSerializer, TaskSerializer, GameSessionSerializer,AssignmentSerializer, RatingSerializer, RegisterSerializer
 
 class HouseViewSet(viewsets.ModelViewSet):
-    queryset = House.objects.all()
     serializer_class = HouseSerializer
+    
+    def get_queryset(self):
+        
+        user = self.request.user
+        if user.is_anonymous:
+            return House.objects.none()
+        
+        return House.objects.filter(members__user=user)
+
+    def perform_create(self, serializer):
+        
+        house = serializer.save(admin=self.request.user)
+
+        profile = self.request.user.profile
+        profile.house = house
+        profile.save()
     
     def join(self, request):
         code = request.data.get('code') #prende il codice dal frontend
@@ -38,7 +53,18 @@ class HouseViewSet(viewsets.ModelViewSet):
         }, status=status.HTTP_200_OK)
 
 class ProfileViewSet(viewsets.ModelViewSet):
-    queryset = Profile.objects.all()
+    
+    def get_queryset(self): 
+        user = self.request.user
+        if user.is_anonymous:
+            return Profile.objects.none()
+            
+        
+        if hasattr(user, 'profile') and user.profile.house:
+            return Profile.objects.filter(house=user.profile.house)
+        else:
+        
+            return Profile.objects.filter(user=user)
     serializer_class = ProfileSerializer
 
 class TaskViewSet(viewsets.ModelViewSet):
