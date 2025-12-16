@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import authService from '../services/auth';
+import api from '../services/api';
 
 function Login() {
   const [username, setUsername] = useState('');
@@ -12,13 +13,23 @@ function Login() {
     e.preventDefault();
     try {
       await authService.login(username, password);
-      //se non ci sono errori, torna alla home
-      navigate('/');
-      window.location.reload(); //ricarica per aggiornare la dashboard
+      const housesRes = await api.get('houses/');
+        
+        if (housesRes.data.length > 0) {
+            // Se la lista non è vuota, ho una casa -> Vado alla Dashboard
+            navigate('/dashboard');
+        } else {
+            // Se la lista è vuota, non ho una casa -> Vado a sceglierla
+            navigate('/house-selection');
+        }
+
+        // Non serve più window.location.reload(), il navigate è sufficiente!
+        
     } catch (err) {
-      setError('Credenziali non valide! Riprova.');
+        console.error(err);
+        setError('Credenziali non valide! Riprova.');
     }
-  };
+};
 
   return (
     <div className="d-flex justify-content-center mt-5">
