@@ -36,6 +36,8 @@ class TaskSerializer(serializers.ModelSerializer):
     is_taken_by_me = serializers.SerializerMethodField()
     session_start = serializers.DateTimeField(source='session.start_time', read_only=True)
     session_end = serializers.DateTimeField(source='session.end_time', read_only=True)
+    assignee_name = serializers.ReadOnlyField(source='assignee.username') 
+    # il campo serve a visualizzare il nome di chi ha svolto la task 
     
 
     class Meta:

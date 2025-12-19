@@ -19,6 +19,12 @@ const gameService = {
     return response.data;
   },
 
+  // recupera le task che devono ancora ricevere il proprio voto 
+  getAwaitingRatings: async ()=> {
+    const response = await api.get('tasks/?status=completed&needs_rating=true');
+    return response.data;
+  },
+
 
   completeAssignment: async (assignmentId) => {
     const response = await api.post(`assignments/${assignmentId}/complete/`);

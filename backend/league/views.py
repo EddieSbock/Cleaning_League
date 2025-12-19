@@ -1,4 +1,4 @@
-from rest_framework import viewsets, status, generics
+from rest_framework import viewsets, status, generics, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
@@ -42,8 +42,33 @@ class ProfileViewSet(viewsets.ModelViewSet):
     serializer_class = ProfileSerializer
 
 class TaskViewSet(viewsets.ModelViewSet):
-    queryset = Task.objects.all()
+    permission_class=[permissions.IsAuthenticated] #classe di sicurezza fornita da Django.
+    #si assicura che l'utente sia loggato prima di valutare.
     serializer_class = TaskSerializer
+    
+    def queryset (self):
+        queryset = Task.objects.all() 
+        user_profile = self.request.user.profile 
+
+        status_param = self.request.query_params.get('status') 
+        needs_rating = self.request.query_params.get('needs_rating') 
+
+        # controlla se ci sono delle task da votare
+        if status_param == 'completed' and needs_rating == 'true':
+            
+            # filtra solo task completate
+            queryset = queryset.filter(is_completed=True)
+
+            # esclude la propria task 
+            # usare lo stesso relatd_name dei models
+            queryset = queryset.exclude(assignments__assigned_to=user_profile)
+
+            # eslude le task già votate
+            # cerca gli ID delle task che hanno un voto dato dal proprio profilo
+            voted_task_ids = Rating.objects.filter(voter=user_profile).values_list('task_id', flat=True)
+            queryset = queryset.exclude(id__in=voted_task_ids)
+
+        return queryset
     
     @action(detail=True, methods=['post'])
     def grab(self, request, pk=None):
