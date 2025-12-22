@@ -21,6 +21,10 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password'],
             email=validated_data.get('email', ''),
         )
+        Profile.objects.create(
+            user=user, 
+            nickname=validated_data.get(user.username)
+        )
         return user
 
 class SubTaskSerializer(serializers.ModelSerializer):

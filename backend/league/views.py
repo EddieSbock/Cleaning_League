@@ -20,8 +20,20 @@ class HouseViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         
         house = serializer.save(admin=self.request.user)
+        
 
-        profile = self.request.user.profile
+        if hasattr(self.request.user, 'profile'):
+            profile = self.request.user.profile
+        else:
+
+            profile = Profile.objects.create(
+                user=self.request.user, 
+                nickname=self.request.user.username,
+                level=1,
+                total_xp=0
+            )
+
+
         profile.house = house
         profile.save()
     

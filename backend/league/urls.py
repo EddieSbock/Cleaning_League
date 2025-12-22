@@ -7,8 +7,8 @@ from rest_framework_simplejwt.views import (
 from .views import HouseViewSet, ProfileViewSet, TaskViewSet, GameSessionViewSet, AssignmentViewSet, RatingViewSet, RegisterView
 
 router = DefaultRouter() #per crare automaticamente gli url delle altre pagine
-router.register(r'houses', HouseViewSet)
-router.register(r'profiles', ProfileViewSet)
+router.register(r'houses', HouseViewSet, basename='house')
+router.register(r'profiles', ProfileViewSet, basename='profile')
 router.register(r'tasks', TaskViewSet)
 router.register(r'sessions', GameSessionViewSet)
 router.register(r'assignments', AssignmentViewSet)
