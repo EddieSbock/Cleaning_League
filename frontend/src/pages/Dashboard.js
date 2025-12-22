@@ -4,18 +4,6 @@ import api from '../services/api';
 import authService from '../services/auth';
 import './Dashboard.css';
 
-import ClickSpark from '../components/ClickSpark';
-
-<ClickSpark
-  sparkColor='#000000ff'
-  sparkSize={10}
-  sparkRadius={15}
-  sparkCount={8}
-  duration={400}
->
-  {}
-</ClickSpark>
-
 const Dashboard = () => {
   const [house, setHouse] = useState(null);
   const [session, setSession] = useState(null);

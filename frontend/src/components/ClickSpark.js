@@ -131,12 +131,16 @@ const ClickSpark = ({
     sparksRef.current.push(...newSparks);
   };
 
-  return (
+ return (
     <div
+      // ref={parentRef} // Riabilita questo se nel codice originale c'era
       style={{
         position: 'relative',
         width: '100%',
-        height: '100%'
+        minHeight: '100vh', // Assicura che copra tutto lo schermo
+        cursor: 'default'
+        // NOTA: Ho rimosso 'overflow: hidden' da qui per evitare il taglio brutale.
+        // Se le scintille creano scrollbar, lo rimetteremo sul body via CSS globale.
       }}
       onClick={handleClick}
     >
@@ -150,10 +154,27 @@ const ClickSpark = ({
           position: 'absolute',
           top: 0,
           left: 0,
-          pointerEvents: 'none'
+          pointerEvents: 'none',
+          zIndex: 9999,
+          overflow: 'hidden' // Spostiamo l'overflow hidden solo sul canvas o gestiamo dopo
         }}
       />
-      {children}
+      
+      {/* MODIFICA IMPORTANTE QUI SOTTO:
+         Invece di height: 100%, usiamo minHeight: 100vh e flexbox.
+         Questo permette al contenuto di espandersi senza essere tagliato.
+      */}
+      <div style={{ 
+          position: 'relative', 
+          zIndex: 1, 
+          width: '100%', 
+          minHeight: '100vh', 
+          display: 'flex', 
+          flexDirection: 'column' 
+      }}>
+        {children}
+      </div>
+      
     </div>
   );
 };
