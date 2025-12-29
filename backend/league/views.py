@@ -1,13 +1,15 @@
 from rest_framework import viewsets, status, generics
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth.models import User
+from django.db.models import Q
 from .models import House, Profile, Task, GameSession, Assignment, Rating
 from .serializers import HouseSerializer, ProfileSerializer, TaskSerializer, GameSessionSerializer,AssignmentSerializer, RatingSerializer, RegisterSerializer
 
 class HouseViewSet(viewsets.ModelViewSet):
     serializer_class = HouseSerializer
+    permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
         
@@ -15,27 +17,40 @@ class HouseViewSet(viewsets.ModelViewSet):
         if user.is_anonymous:
             return House.objects.none()
         
-        return House.objects.filter(members__user=user)
+        return House.objects.filter(Q(members__user=user) | Q(admin=user)).distinct()
 
     def perform_create(self, serializer):
-        
-        house = serializer.save(admin=self.request.user)
-        
+        try:
+            print(f"Tentativo creazione casa per utente: {self.request.user}")
+            
+            
+            house = serializer.save(admin=self.request.user)
+            print(f"Casa creata: {house.name} (ID: {house.id})")
 
-        if hasattr(self.request.user, 'profile'):
-            profile = self.request.user.profile
-        else:
-
-            profile = Profile.objects.create(
-                user=self.request.user, 
-                nickname=self.request.user.username,
-                level=1,
-                total_xp=0
+           
+            profile, created = Profile.objects.get_or_create(
+                user=self.request.user,
+                defaults={
+                    'nickname': self.request.user.username,
+                    'level': 1,
+                    'total_xp': 0
+                }
             )
+            
+            if created:
+                print(" Profilo creato al volo!")
+            else:
+                print("Profilo esistente trovato.")
 
+            profile.house = house
+            profile.save()
+            print("Profilo collegato alla casa con successo.")
 
-        profile.house = house
-        profile.save()
+        except Exception as e:
+        
+            print(f"ERRORE CRITICO CREAZIONE CASA: {e}")
+            
+            raise e
     
     def join(self, request):
         code = request.data.get('code') #prende il codice dal frontend

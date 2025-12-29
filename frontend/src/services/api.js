@@ -13,7 +13,7 @@ api.interceptors.request.use( //è fondamentale, senza di questo si verificano e
   (config) => {
     const token = localStorage.getItem('userToken');
     if (token) {
-      config.headers.Authorization = `Token ${token}`;
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
