@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import './TaskPage/StylePage.css';
-import axios from 'axios';
+import '../TaskPage/StylePage.css';
+import api from '../../services/api';
 
 const TaskMarket = () => {
   const [availableTasks, setAvailableTasks] = useState([]);
@@ -14,61 +14,63 @@ const TaskMarket = () => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/tasks'); 
+        const response = await api.get('tasks/'); 
+        setAvailableTasks(response.data);
         
        } catch (err) {
         console.error(err);
-        setError("Impossibile contattare il server Python");
+        setError("Impossibile caricare le missioni. Riprova più tardi.");
     } finally {
         setLoading(false);
     }
-};
+    }
+  fetchTasks ();
+  }, []);
 
-fetchTasks ();
-}, []);
-
+    const handleSelectTask = (task) => {
+      if (selectedTask && selectedTask.id === task.id) {
+          setSelectedTask(null);
+      } else {
+          setSelectedTask(task);
+      }
+    };
  
-    if (selectedTask && selectedTask.id === task.id) {
-        setSelectedTask(null);
-    } else {
-        setSelectedTask(task);
-    }
-  };
+    const handleAcceptTask = async () => {
+      if (!selectedTask) return;
 
-  const handleAcceptTask = async () => {
-    if (!selectedTask) return;
+      try {
+          
+          await api.post(`tasks/${selectedTask.id}/grab/`, {});
+          //se non va in errore, aggiorniamo la grafica
+          setMyInventory([...myInventory, selectedTask]);
+          setAvailableTasks(availableTasks.filter(t => t.id !== selectedTask.id));
+          setSelectedTask(null);
+          
+          
+          alert("Task accettata con successo!");
 
-    try {
-        
-        await axios.post(`http://localhost:5000/api/tasks/${selectedTask.id}/grab/`, {});
-
-        //se non va in errore, aggiorniamo la grafica
-        setMyInventory([...myInventory, selectedTask]);
-        setAvailableTasks(availableTasks.filter(t => t.id !== selectedTask.id));
-        setSelectedTask(null);
-        
-        
-        alert("Task accettata con successo!");
-
-    } catch (err) {
-        console.error("Errore API:", err);
-        
-        if (err.response && err.response.data && err.response.data.error) {
-            alert("Errore: " + err.response.data.error);
-        } else {
-            alert("Impossibile accettare la task. Riprova più tardi.");
-        }
-    }
-  };
+      } catch (err) {
+          console.error("Errore API:", err);
+          
+          if (err.response && err.response.data && err.response.data.error) {
+              alert("Errore: " + err.response.data.error);
+          } else {
+              alert("Impossibile accettare la task. Riprova più tardi.");
+          }
+      }
 
   
-  if (loading) return <div className="text-center mt-5">Caricamento missioni in corso...</div>;
-  if (error) return <div className="alert alert-danger">{error}</div>;
+      if (loading) 
+        return <div className="text-center mt-5">Caricamento missioni in corso...</div>;
+      if (error) 
+        return <div className="alert alert-danger">{error}</div>;
+
+    };
 
   return (
     <div className="market-container"> 
        {}
-        return (
+
     <div className="market-container"> 
       
       {}
@@ -179,5 +181,5 @@ fetchTasks ();
   );
     </div>
   );
-
+};
 export default TaskMarket;

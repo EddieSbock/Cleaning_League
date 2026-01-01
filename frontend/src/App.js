@@ -11,6 +11,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import HomePage from './pages/HomePage';
 import HouseSelection from './pages/HouseSelection';
+import TaskMarket from './pages/TaskPage/TaskMarket';
 import authService from './services/auth';
 
 
@@ -37,6 +38,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/house-selection" element={<HouseSelection />} />
+          <Route path="/task-market" element={<TaskMarket />} />
 
           <Route 
              path="/house-selection" 

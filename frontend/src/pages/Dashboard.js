@@ -222,7 +222,7 @@ const Dashboard = () => {
 
                 <button 
                     className="btn-go-tasks" 
-                    onClick={() => navigate('/tasks')} 
+                    onClick={() => navigate('/task-market')} 
                 >
                     Cerca nuove Task →
                 </button>

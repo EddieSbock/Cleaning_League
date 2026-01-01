@@ -58,7 +58,7 @@ class TaskSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if request and hasattr(request.user, 'profile'):
         
-            return obj.assignments.filter(assigned_to=request.user.profile).exists()
+            return obj.assignment_set.filter(assigned_to=request.user.profile).exists()
         return False
         
 class GameSessionSerializer(serializers.ModelSerializer):
