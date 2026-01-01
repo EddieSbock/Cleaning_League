@@ -30,12 +30,16 @@ function HouseSelection() {
     try {
       const response = await api.post('houses/join/', { code: houseCode });
       // salva l'ID ed effettua l'accesso
-      localStorage.setItem('houseId', response.data.house_id);
+      localStorage.setItem('houseId', response.data.id);
       alert("Benvenuto a casa!");
       window.location.href = '/dashboard';
     } catch (err) {
       console.error(err);
-      setError("Codice non valido");
+      if (err.response && err.response.data && err.response.data.error) {
+       setError(err.response.data.error); // Mostra l'errore specifico del backend (es. "Codice non valido")
+    } else {
+       setError("Codice non valido o errore di connessione");
+    }
     }
   };
 
@@ -78,11 +82,11 @@ function HouseSelection() {
               <label className="form-label fw-bold">Inserisci il Codice Casa</label>
               <input 
                 type="text" 
-                className="form-control form-control-lg text-uppercase text-center" 
+                className="form-control form-control-lg text-center" 
                 placeholder="es. X8K2P9"
                 maxLength={8}
                 value={houseCode}
-                onChange={(e) => setHouseCode(e.target.value.toUpperCase())}
+                onChange={(e) => setHouseCode(e.target.value)}
                 required
               />
               <div className="form-text text-center">Chiedi il codice all'admin.</div>

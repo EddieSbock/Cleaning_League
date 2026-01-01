@@ -26,9 +26,12 @@ const Dashboard = () => {
         setHouse(myHouse);
 
         if (myHouse) {
-            const profilesReq = await api.get('profiles/');
-            const houseMembers = profilesReq.data.filter(p => p.house === myHouse.id);
-            setMembers(houseMembers);
+            if (myHouse.members) {
+                console.log("Membri trovati nella casa:", myHouse.members);
+                setMembers(myHouse.members);
+            } else {
+                console.warn("Attenzione: il campo 'members' non è arrivato dal backend.");
+            }
         }
 
         const sessionsReq = await api.get('sessions/');
@@ -45,6 +48,7 @@ const Dashboard = () => {
         
       
         if (error.response && error.response.status === 401) {
+            localStorage.removeItem('access');
             alert("Sessione scaduta, rifai il login!");
             navigate('/login'); 
         }

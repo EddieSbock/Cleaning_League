@@ -52,6 +52,7 @@ class HouseViewSet(viewsets.ModelViewSet):
             
             raise e
     
+    @action(detail=False, methods=['post'])
     def join(self, request):
         code = request.data.get('code') #prende il codice dal frontend
         
@@ -74,10 +75,8 @@ class HouseViewSet(viewsets.ModelViewSet):
         #assegna la casa al profilo
         profile.house = house
         profile.save()
-        return Response({
-            'message': f'Benvenuto in {house.name}!',
-            'house_id': house.id
-        }, status=status.HTTP_200_OK)
+        serializer = self.get_serializer(house)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class ProfileViewSet(viewsets.ModelViewSet):
     
