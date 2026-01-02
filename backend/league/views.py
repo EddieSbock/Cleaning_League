@@ -80,18 +80,15 @@ class HouseViewSet(viewsets.ModelViewSet):
 
 class ProfileViewSet(viewsets.ModelViewSet):
     
-    def get_queryset(self): 
-        user = self.request.user
-        if user.is_anonymous:
-            return Profile.objects.none()
-            
+    def get_queryset(self):
+
+        return Profile.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
         
-        if hasattr(user, 'profile') and user.profile.house:
-            return Profile.objects.filter(house=user.profile.house)
-        else:
-        
-            return Profile.objects.filter(user=user)
     serializer_class = ProfileSerializer
+    permission_classes = [IsAuthenticated]
 
 class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()

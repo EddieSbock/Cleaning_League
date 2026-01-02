@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import api from '../../services/api';
 import './ProfileStyle.css';
-import authService from '../../services/auth'; 
 
 const ProfilePage = () => {
     // Stati per i dati
+    const [profileId, setProfileId] = useState(null);
     const [nickname, setNickname] = useState('');
     const [avatarPreview, setAvatarPreview] = useState(null); // URL per l'anteprima
     const [selectedFile, setSelectedFile] = useState(null);   //file da inviare
@@ -19,19 +19,27 @@ const ProfilePage = () => {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                //Nota: in caso  di errore aggiustare la rotta Django
-                const user = authService.getCurrentUser();
-                if(user) {
-                    //per ID nello user object
-                    const response = await axios.get(`http://localhost:5000/api/profiles/${user.profile_id || user.id}/`); 
-                    setNickname(response.data.nickname || '');
-                    // Se c'è già un'immagine salvata, la mostra
-                    if (response.data.avatar) {
-                        setAvatarPreview(response.data.avatar); 
+                
+                const response = await api.get('profiles/'); 
+                
+                const myProfile = response.data[0]; 
+
+                if (myProfile) {
+                    setProfileId(myProfile.id); // Salviamo l'ID vero del profilo per dopo
+                    setNickname(myProfile.nickname || '');
+                    if (myProfile.avatar) {
+                        const avatarPath = myProfile.avatar;
+
+                        const fullAvatarUrl = avatarPath.startsWith('http') 
+                            ? avatarPath 
+                            : `http://127.0.0.1:8000${avatarPath}`;
+
+                        setAvatarPreview(fullAvatarUrl);
                     }
                 }
             } catch (err) {
                 console.error("Errore caricamento profilo", err);
+                setMessage("Impossibile caricare il profilo. Sei loggato?");
             }
         };
         fetchProfile();
@@ -58,8 +66,13 @@ const ProfilePage = () => {
         setLoading(true);
         setMessage('');
 
+        if (!profileId) {
+            setMessage("Errore: Profilo non trovato. Ricarica la pagina.");
+            setLoading(false);
+            return;
+        }
+
         try {
-            const user = authService.getCurrentUser();
 
             const formData = new FormData();
             formData.append('nickname', nickname);
@@ -70,18 +83,29 @@ const ProfilePage = () => {
             }
 
             //è necessario che l'interceptor non forzi application/json
-            await axios.patch(`http://localhost:5000/api/profiles/${user.profile_id || user.id}/`, formData, {
+            const response = await api.patch(`profiles/${profileId}/`, formData, {                
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 }
             });
 
             setMessage('Profilo aggiornato con successo!');
-            setLoading(false);
+
+            const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+            localStorage.setItem('user', JSON.stringify({
+                ...currentUser,
+                nickname: response.data.nickname // Aggiorna il nome salvato
+            }));
+
+            setTimeout(() => {
+                window.location.reload(); 
+            }, 1000);
 
         } catch (err) {
             console.error("Errore salvataggio", err);
             setMessage('Errore durante il salvataggio.');
+            setLoading(false);
+        } finally {
             setLoading(false);
         }
     };
@@ -114,6 +138,7 @@ const ProfilePage = () => {
                             ref={fileInputRef} 
                             onChange={handleImageChange} 
                             accept="image/*" // Accetta solo immagini
+                            style={{display: 'none'}}
                         />
                     </div>
 
@@ -133,6 +158,7 @@ const ProfilePage = () => {
                     {message && (
                         <div style={{
                             marginBottom: '15px', 
+                            textAlign: 'center',
                             color: message.includes('Errore') ? '#ff4d4d' : '#00ff88'
                         }}>
                             {message}
