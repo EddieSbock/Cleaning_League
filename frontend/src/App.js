@@ -5,6 +5,7 @@ import './App.css';
 
 import Menubar from './components/Menubar';
 import PrivateRoute from './components/PrivateRoute';
+import ClickSpark from './components/ClickSpark';
 
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
@@ -18,11 +19,20 @@ import authService from './services/auth';
 function App() {
   const user = authService.getCurrentUser();
   const hasHouse=authService.hasHouse(); 
+  
   return (
     <BrowserRouter>
-      {/* La Menubar sta FUORI dalle Routes così rimane fissa in tutte le pagine */}
+     
+      <ClickSpark
+  sparkColor='#000000ff'
+  sparkSize={10}
+  sparkRadius={15}
+  sparkCount={8}
+  duration={400}
+>
+
+       {/* La Menubar sta FUORI dalle Routes così rimane fissa in tutte le pagine */}
       <Menubar />
-      
       <div className="container mt-3">
         <Routes>
 
@@ -52,7 +62,7 @@ function App() {
           <Route 
             path="/dashboard" 
             element={
-              <PrivateRoute requiresHous={true}>
+              <PrivateRoute requiresHouse={true}>
                 <Dashboard />
               </PrivateRoute>
             } 
@@ -60,8 +70,8 @@ function App() {
 
         </Routes>
       </div>
+      </ClickSpark>
     </BrowserRouter>
   );
 }
-
 export default App;

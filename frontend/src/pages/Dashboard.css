@@ -58,12 +58,6 @@
     gap: 20px;
 }
 
-.card {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
 
 .task-widget { grid-row: span 2; }
 
