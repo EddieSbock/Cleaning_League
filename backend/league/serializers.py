@@ -8,6 +8,11 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'email']
         
+class MemberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ['nickname', 'level', 'total_xp']
+        
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -20,6 +25,12 @@ class RegisterSerializer(serializers.ModelSerializer):
             username=validated_data['username'],
             password=validated_data['password'],
             email=validated_data.get('email', ''),
+        )
+        Profile.objects.create(
+            user=user, 
+            nickname=user.username, 
+            level=1, 
+            total_xp=0
         )
         return user
 
@@ -47,7 +58,7 @@ class TaskSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if request and hasattr(request.user, 'profile'):
         
-            return obj.assignments.filter(assigned_to=request.user.profile).exists()
+            return obj.assignment_set.filter(assigned_to=request.user.profile).exists()
         return False
         
 class GameSessionSerializer(serializers.ModelSerializer):
@@ -62,6 +73,7 @@ class GameSessionSerializer(serializers.ModelSerializer):
 
 class HouseSerializer(serializers.ModelSerializer):
     admin_details = UserSerializer(source='admin', read_only=True)# per i dettagli dell'admin
+    members = MemberSerializer(many=True, read_only=True)
     
     active_sessions = serializers.SerializerMethodField()
     

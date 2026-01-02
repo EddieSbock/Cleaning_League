@@ -18,7 +18,9 @@ class House(models.Model):
     admin = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='managed_houses')
 
     def __str__(self):
-        return f"{self.name} (Admin: {self.admin.username})"
+        if self.admin:
+            return f"{self.name} (Admin: {self.admin.username})"
+        return f"{self.name} (Admin: Nessuno)"
 
 
 class Profile(models.Model):
