@@ -87,7 +87,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
         
     serializer_class = ProfileSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
 class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()
