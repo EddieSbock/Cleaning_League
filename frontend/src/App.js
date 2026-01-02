@@ -5,6 +5,7 @@ import './App.css';
 
 import Menubar from './components/Menubar';
 import PrivateRoute from './components/PrivateRoute';
+import ClickSpark from './components/ClickSpark';
 
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
@@ -13,16 +14,26 @@ import HomePage from './pages/HomePage';
 import HouseSelection from './pages/HouseSelection';
 import TaskMarket from './pages/TaskPage/TaskMarket';
 import authService from './services/auth';
+import ProfilePage from './pages/ProfilePage/ProfilePage';
 
 
 function App() {
   const user = authService.getCurrentUser();
   const hasHouse=authService.hasHouse(); 
+  
   return (
     <BrowserRouter>
-      {/* La Menubar sta FUORI dalle Routes così rimane fissa in tutte le pagine */}
+     
+      <ClickSpark
+  sparkColor='#000000ff'
+  sparkSize={10}
+  sparkRadius={15}
+  sparkCount={8}
+  duration={400}
+>
+
+       {/* La Menubar sta FUORI dalle Routes così rimane fissa in tutte le pagine */}
       <Menubar />
-      
       <div className="container mt-3">
         <Routes>
 
@@ -52,16 +63,27 @@ function App() {
           <Route 
             path="/dashboard" 
             element={
-              <PrivateRoute requiresHous={true}>
+              <PrivateRoute requiresHouse={true}>
                 <Dashboard />
               </PrivateRoute>
             } 
           />
 
+{/* vavigate login impedisce a persone non registrate di accedere alle missioni */}
+          <Route 
+          path="/task-market"
+          element={user ? <TaskMarket /> : <Navigate to= '/login' />}
+          />
+
+          <Route 
+          path="/profile" 
+          element={user ? <ProfilePage /> : <Navigate to="/login" />} 
+          />
+
         </Routes>
       </div>
+      </ClickSpark>
     </BrowserRouter>
   );
 }
-
 export default App;

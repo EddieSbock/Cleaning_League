@@ -178,7 +178,6 @@ const TaskMarket = () => {
         </div>
       </div>
     </div>
-  );
     </div>
   );
 };
