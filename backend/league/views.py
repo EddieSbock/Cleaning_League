@@ -1,15 +1,14 @@
-from rest_framework import viewsets, status, generics
+from rest_framework import viewsets, status, generics, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth.models import User
 from django.db.models import Q
 from .models import House, Profile, Task, GameSession, Assignment, Rating
-from .serializers import HouseSerializer, ProfileSerializer, TaskSerializer, GameSessionSerializer,AssignmentSerializer, RatingSerializer, RegisterSerializer
+from .serializers import HouseSerializer, ProfileSerializer, TaskSerializer, GameSessionSerializer,AssignmentSerializer, RatingSerializer, RegisterSerializer, TaskCreateSerializer
 
 class HouseViewSet(viewsets.ModelViewSet):
     serializer_class = HouseSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
         
@@ -95,7 +94,12 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
 class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()
-    serializer_class = TaskSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return TaskCreateSerializer
+        return TaskSerializer
     
     @action(detail=True, methods=['post'])
     def grab(self, request, pk=None):
@@ -165,5 +169,5 @@ class RatingViewSet(viewsets.ModelViewSet):
             
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
-    permission_classes = (AllowAny,)
+    permission_classes = [permissions.AllowAny]
     serializer_class = RegisterSerializer

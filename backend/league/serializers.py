@@ -60,6 +60,24 @@ class TaskSerializer(serializers.ModelSerializer):
         
             return obj.assignment_set.filter(assigned_to=request.user.profile).exists()
         return False
+
+class TaskCreateSerializer(serializers.ModelSerializer):
+    subtasks = SubTaskSerializer(many=True, required=False)
+
+    class Meta:
+        model = Task
+        fields = ['session','title','description','xp_reward','max_users','deadline', 'subtasks']
+
+    def create(self, validated_data):
+        
+        subtasks_data = validated_data.pop('subtasks', [])
+        
+        task = Task.objects.create(**validated_data)
+        
+        for sub_data in subtasks_data:
+            SubTask.objects.create(task=task, **sub_data)
+            
+        return task
         
 class GameSessionSerializer(serializers.ModelSerializer):
 
