@@ -11,7 +11,7 @@ router.register(r'houses', HouseViewSet, basename='house')
 router.register(r'profiles', ProfileViewSet, basename='profile')
 router.register(r'tasks', TaskViewSet)
 router.register(r'sessions', GameSessionViewSet)
-router.register(r'assignments', AssignmentViewSet)
+router.register(r'assignments', AssignmentViewSet, basename='assignment')
 router.register(r'ratings', RatingViewSet)
 
 

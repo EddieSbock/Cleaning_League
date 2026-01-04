@@ -1,5 +1,6 @@
 from rest_framework import viewsets, status, generics, permissions
 from rest_framework.response import Response
+from django.utils import timezone
 from rest_framework.decorators import action
 from django.contrib.auth.models import User
 from django.db.models import Q
@@ -114,7 +115,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             
         # controlla se ci sono posti disponibili
         current_takers = Assignment.objects.filter(task=task).count()
-        if current_takers >= task.max_assignees:
+        if current_takers >= task.max_users:
             return Response({'error': 'Posti esauriti per questa task!'}, status=400)
 
         Assignment.objects.create(
@@ -130,7 +131,12 @@ class GameSessionViewSet(viewsets.ModelViewSet):
     serializer_class = GameSessionSerializer
     
 class AssignmentViewSet(viewsets.ModelViewSet):
-    queryset = Assignment.objects.all()
+
+    def get_queryset(self):
+        return Assignment.objects.filter(
+            assigned_to__user=self.request.user,
+            completed_at__isnull=True 
+        )
     serializer_class = AssignmentSerializer
 
     #API con: POST /api/assignments/{ID}/complete/
@@ -138,6 +144,8 @@ class AssignmentViewSet(viewsets.ModelViewSet):
     def complete(self, request, pk=None):
         assignment = self.get_object()
         
+        assignment.completed_at = timezone.now()
+        assignment.save()
     
         if assignment.status == 'COMPLETED':
             return Response({'error': 'Task già completata!'}, status=400)
@@ -145,7 +153,7 @@ class AssignmentViewSet(viewsets.ModelViewSet):
         if assignment.assigned_to.user != request.user:
             return Response({'error': 'Non è la tua task!'}, status=403)
 
-        points = assignment.calculate_score_now()
+        points = assignment.calculate_bonus()
         return Response({
             'status': 'Task completata!',
             'earned_xp': points,

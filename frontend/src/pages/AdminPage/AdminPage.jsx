@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api'; 
-import './AdminPage.css';
+import './AdminStyle.css';
 
 const AdminPage = () => {
     

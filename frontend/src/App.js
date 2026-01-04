@@ -51,6 +51,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/house-selection" element={<HouseSelection />} />
           <Route path="/task-market" element={<TaskMarket />} />
+          <Route path="/profile" element={<ProfilePage />} />
 
           <Route 
              path="/house-selection" 

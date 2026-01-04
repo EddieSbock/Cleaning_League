@@ -119,9 +119,10 @@ const Dashboard = () => {
   const handleCompleteTask = async (assignmentId) => {
     try {
       const res = await api.post(`assignments/${assignmentId}/complete/`);
+      setMyAssignments(prev => prev.filter(task => task.id !== assignmentId));
       alert(`Grande! Hai guadagnato ${res.data.earned_xp} XP!`);
-      if(session) refreshTasks(session.id);
     } catch (error) {
+      console.error(error);
       alert("Errore nel completamento");
     }
   };

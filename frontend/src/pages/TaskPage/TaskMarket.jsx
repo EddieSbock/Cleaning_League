@@ -58,13 +58,6 @@ const TaskMarket = () => {
               alert("Impossibile accettare la task. Riprova più tardi.");
           }
       }
-
-  
-      if (loading) 
-        return <div className="text-center mt-5">Caricamento missioni in corso...</div>;
-      if (error) 
-        return <div className="alert alert-danger">{error}</div>;
-
     };
 
   return (
@@ -145,16 +138,6 @@ const TaskMarket = () => {
                         }
                         </button>
                 <p>{selectedTask.desc}</p>
-                <div className="monitor-stats">
-                    <span>XP: {selectedTask.xp}</span>
-                    <br/>
-                    {}
-                    <span>Posti: {selectedTask.taken_seats|| 0}/{selectedTask.max_assignees}</span>
-                </div>
-                
-                <button className="btn-action" onClick={handleAcceptTask}>
-                    ACCETTA MISSIONE
-                </button>
                 
                 <button className="btn-secondary" onClick={() => setSelectedTask(null)}>
                     CHIUDI
