@@ -160,9 +160,6 @@ const Dashboard = () => {
              </ul>
         </div>
 
-        <button className="btn-profile" onClick={() => navigate('/profile')}>
-                👤 Profilo
-            </button>
 
         <div style={{marginTop: 'auto', paddingTop: '20px'}}>
             <button 
