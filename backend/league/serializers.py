@@ -43,7 +43,7 @@ class TaskSerializer(serializers.ModelSerializer):
     
     subtasks = SubTaskSerializer(many=True, read_only=True) # Include le subtask nel serializer principale
     
-    taken_seats = serializers.IntegerField(source='assignments.count', read_only=True)
+    taken_seats = serializers.IntegerField(source='assignments_set.count', read_only=True)
     is_taken_by_me = serializers.SerializerMethodField()
     session_start = serializers.DateTimeField(source='session.start_time', read_only=True)
     session_end = serializers.DateTimeField(source='session.end_time', read_only=True)

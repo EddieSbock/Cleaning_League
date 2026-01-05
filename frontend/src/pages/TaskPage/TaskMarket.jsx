@@ -61,12 +61,9 @@ const TaskMarket = () => {
     };
 
   return (
-    <div className="market-container"> 
-       {}
 
     <div className="market-container"> 
       
-      {}
       <header className="market-header">
         <h1>Bacheca Missioni</h1>
         <p>Scegli la tua prossima sfida</p>
@@ -160,7 +157,6 @@ const TaskMarket = () => {
             )}
         </div>
       </div>
-    </div>
     </div>
   );
 };
