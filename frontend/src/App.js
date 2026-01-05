@@ -6,6 +6,7 @@ import './App.css';
 import Menubar from './components/Menubar';
 import PrivateRoute from './components/PrivateRoute';
 import ClickSpark from './components/ClickSpark';
+import Background from './components/Background';
 
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
@@ -26,69 +27,74 @@ function App() {
     <BrowserRouter>
      
       <ClickSpark
-  sparkColor='#000000ff'
-  sparkSize={10}
-  sparkRadius={15}
-  sparkCount={8}
-  duration={400}
->
+        sparkColor='#00fff5'
+        sparkSize={10}
+        sparkRadius={15}
+        sparkCount={8}
+        duration={400}
+      >
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
+                <Background />
+              </div>
+        <div style={{ position: 'relative', zIndex: 10 }}>
 
        {/* La Menubar sta FUORI dalle Routes così rimane fissa in tutte le pagine */}
-      <Menubar />
-      <div className="container mt-3">
-        <Routes>
+          <Menubar />
+          <div className="container mt-3">
+            <Routes>
 
-          <Route 
-            path="/" 
-            element={
-              user 
-                ? (hasHouse ? <Navigate to="/dashboard" /> : <Navigate to="/house-selection" />) 
-                : <HomePage />
-            } 
-          />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/house-selection" element={<HouseSelection />} />
-          <Route path="/task-market" element={<TaskMarket />} />
-          <Route path="/profile" element={<ProfilePage />} />
+              <Route 
+                path="/" 
+                element={
+                  user 
+                    ? (hasHouse ? <Navigate to="/dashboard" /> : <Navigate to="/house-selection" />) 
+                    : <HomePage />
+                } 
+              />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/house-selection" element={<HouseSelection />} />
+              <Route path="/task-market" element={<TaskMarket />} />
+              <Route path="/profile" element={<ProfilePage />} />
 
-          <Route 
-             path="/house-selection" 
-             element={
-               <PrivateRoute>
-                 <HouseSelection />
-               </PrivateRoute>
-             } 
-          />
+              <Route 
+                path="/house-selection" 
+                element={
+                  <PrivateRoute>
+                    <HouseSelection />
+                  </PrivateRoute>
+                } 
+              />
 
-          <Route 
-            path="/dashboard" 
-            element={
-              <PrivateRoute requiresHouse={true}>
-                <Dashboard />
-              </PrivateRoute>
-            } 
-          />
+              <Route 
+                path="/dashboard" 
+                element={
+                  <PrivateRoute requiresHouse={true}>
+                    <Dashboard />
+                  </PrivateRoute>
+                } 
+              />
 
-{/* navigate login impedisce a persone non registrate di accedere alle missioni */}
-          <Route 
-          path="/task-market"
-          element={user ? <TaskMarket /> : <Navigate to= '/login' />}
-          />
+    {/* navigate login impedisce a persone non registrate di accedere alle missioni */}
+              <Route 
+              path="/task-market"
+              element={user ? <TaskMarket /> : <Navigate to= '/login' />}
+              />
 
-          <Route 
-          path="/profile" 
-          element={user ? <ProfilePage /> : <Navigate to="/login" />} 
-          />
+              <Route 
+              path="/profile" 
+              element={user ? <ProfilePage /> : <Navigate to="/login" />} 
+              />
 
-          <Route
-          path="/admin"
-          element={<AdminPage />} 
-          />
+              <Route
+              path="/admin"
+              element={<AdminPage />} 
+              />
 
-        </Routes>
-      </div>
+            </Routes>
+          </div>
+        </div>
       </ClickSpark>
     </BrowserRouter>
   );
