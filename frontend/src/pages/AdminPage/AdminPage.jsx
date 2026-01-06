@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api'; 
 import './AdminStyle.css';
+import authService from '../../services/auth';
 
 const AdminPage = () => {
     
     const [activeSession, setActiveSession] = useState(null);
     const [endDate, setEndDate] = useState(''); //è vuoto, bisogna metterci una data di fine
+    const [isAdmin, setIsAdmin] = useState(false);
     
     // stato per nuova task
     const [newTask, setNewTask] = useState({
@@ -20,8 +22,65 @@ const AdminPage = () => {
 
     // carimaneto iniziale
     useEffect(() => {
-        fetchSessionStatus();
+        const initData = async () => {
+            await checkAdminStatus();
+            await fetchSessionStatus();
+        };
+        initData();
     }, []);
+
+    const parseJwt = (token) => {
+        try {
+            if (!token) return null;
+            // Prende la parte centrale del token e la decodifica
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(jsonPayload);
+        } catch (e) {
+            console.error("Errore decodifica token", e);
+            return null;
+        }
+    };
+
+    const checkAdminStatus = async () => {
+        try {
+            const token = authService.getCurrentUser();
+
+            let myId = null;
+            if (typeof token === 'string') {
+                const decoded = parseJwt(token);
+                if (decoded) {
+                    myId = decoded.user_id; // Di solito nei JWT Django l'id è qui
+                }
+            } else if (token && token.user_id) {
+                myId = token.user_id;
+            }
+
+            console.log("ID decodificato:", myId);
+
+            const houseRes = await api.get('houses/');
+            
+            
+            if (houseRes.data.length > 0) {
+                const myHouse = houseRes.data[0];
+
+                console.log("Dati Casa:", myHouse);
+                console.log("Confronto: admin ID (" + myHouse.admin + ") vs user ID (" + myId + ")");
+            
+
+            if (String(myHouse.admin) === String(myId)) { //confronto id per verificare l'admin
+                setIsAdmin(true);
+            } else {
+                setIsAdmin(false);  
+            }
+        }
+        } catch (error) {
+            console.error("Errore verifica admin", error);
+        }
+    };
 
     const fetchSessionStatus = async () => {
         try {
@@ -57,6 +116,26 @@ const AdminPage = () => {
         }
     };
 
+    const handleStopSession = async () => {
+        if (!activeSession) return;
+        
+        // Chiediamo conferma per sicurezza
+        const confirm = window.confirm("Sei sicuro di voler terminare la sessione in anticipo?");
+        if (!confirm) return;
+
+        try {
+            // Usiamo PATCH per modificare solo il campo is_active
+            await api.patch(`sessions/${activeSession.id}/`, {
+                is_active: false
+            });
+            alert('🛑 Sessione terminata manualmente.');
+            setActiveSession(null); // Aggiorna stato locale
+            fetchSessionStatus();   // Aggiorna dal server
+        } catch (error) {
+            console.error("Errore stop sessione", error);
+            alert("Impossibile fermare la sessione.");
+        }
+    };
 
     const addSubtask = () => {
         if (!tempSubtask.trim()) return;
@@ -102,7 +181,8 @@ const AdminPage = () => {
 
     return (
         <div className="admin-container">
-            <h1 className="admin-header"> Centro di Comando</h1>
+            <h1 className="admin-header"> 
+                {isAdmin ? "Centro di Comando" : "Stato della lega"}</h1>
 
             {}
             <div className="admin-card">
@@ -110,31 +190,53 @@ const AdminPage = () => {
                 
                 {activeSession ? (
                     <div className="session-active-msg">
-                        <p> SESSIONE ATTIVA (ID: {activeSession.id})</p>
+                        <p style={{color: '#00ff00', fontWeight: 'bold', fontSize: '1.2rem'}}> 
+                            SESSIONE ATTIVA (ID: {activeSession.id})</p>
                         <small>Scade il: {new Date(activeSession.end_time).toLocaleDateString()}</small>
+
+                        {isAdmin && (
+                            <div style={{marginTop: '20px', borderTop: '1px solid #ffffff33', paddingTop: '15px'}}>
+                                <button 
+                                    className="btn-action" 
+                                    onClick={handleStopSession}
+                                    style={{backgroundColor: '#800000', border: '1px solid red'}}
+                                >
+                                    🛑 TERMINA SESSIONE ORA
+                                </button>
+                            </div>
+                        )}
                     </div>
                 ) : (
                     <div>
-                        <p className="info-text">Nessuna sessione attiva. Avviane una per permettere ai coinquilini di giocare.</p>
-                        <div className="form-group">
-                            <label>Data di fine sessione </label>
-                            <input 
-                                type="date" 
-                                className="admin-input"
-                                value={endDate}
-                                onChange={(e) => setEndDate(e.target.value)}
-                                min={new Date().toISOString().split("T")[0]} /* impedisce l'uso di date passate*/
+                        {isAdmin ? (
+                            <>
+                                <p className="info-text">Nessuna sessione attiva. Avviane una per permettere ai coinquilini di giocare.</p>
+                                <div className="form-group">
+                                    <label>Data di fine sessione </label>
+                                    <input 
+                                        type="date" 
+                                        className="admin-input"
+                                        value={endDate}
+                                        onChange={(e) => setEndDate(e.target.value)}
+                                        min={new Date().toISOString().split("T")[0]} /* impedisce l'uso di date passate*/
                             />
-                        </div>
-                        <button className="btn-action" onClick={handleStartSession}>
-                            AVVIA NUOVA SESSIONE
-                        </button>
+                                </div>
+                                <button className="btn-action" onClick={handleStartSession}>
+                                    AVVIA NUOVA SESSIONE
+                                </button>
+                            </>
+                            ) : (
+                                <p className='info-text' style={{color: '#aaa'}}>
+                                    Attualmente non ci sono sessioni di pulizia attive. 
+                                    <br/>L'admin avvierà presto una nuova sfida!
+                                </p>
+                        )}
                     </div>
                 )}
             </div>
 
-            {}
-            {activeSession && (
+            {isAdmin ? (
+                activeSession && (
                 <div className="admin-card">
                     <h2> 🧹 Crea Nuova Missione</h2>
                     
@@ -211,6 +313,17 @@ const AdminPage = () => {
                         PUBBLICA TASK
                     </button>
                 </div>
+            ) 
+         ) : (
+                <div className="admin-card" style={{textAlign: 'center', opacity: 0.7}}>
+                                    <h3 style={{color: '#ffd700'}}>Zona Riservata all'Admin</h3>
+                                    <p>
+                                        Solo l'amministratore della casa può creare nuove missioni o terminare la sessione.
+                                    </p>
+                                    <p style={{fontStyle: 'italic', marginTop: '10px', color: '#00fff5'}}>
+                                        "Se vuoi modificare qualcosa o proporre una task, chiedi all'Admin!"
+                                    </p>
+                                </div>
             )}
         </div>
     );
