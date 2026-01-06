@@ -22,5 +22,22 @@ api.interceptors.request.use( //è fondamentale, senza di questo si verificano e
   }
 );
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+
+    if (error.response && error.response.status === 401) {
+      console.warn("Sessione scaduta o token non valido. Logout automatico.");
+      
+    
+      localStorage.removeItem('user');
+      
+    
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;
 
