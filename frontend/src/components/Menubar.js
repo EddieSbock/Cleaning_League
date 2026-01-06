@@ -75,7 +75,7 @@ function Menubar() {
             <div className="d-flex gap-4"
                 style={{
                   position: 'absolute',  
-                    left: '52%',          
+                    left: '50%',          
                     transform: 'translateX(-50%)',
                     zIndex: 10
                 }}
@@ -126,8 +126,25 @@ function Menubar() {
           </div>
         ) : (
           <div className="d-flex gap-2">
-            <Link to="/login" className="btn btn-outline-light btn-sm">Accedi</Link>
-            <Link to="/register" className="btn btn-light btn-sm text-primary fw-bold">Registrati</Link>
+            <Link to="/login" className="btn fw-bold btn-sm"
+              style={{
+                backgroundColor: 'transparent', 
+                color: '#ffffffff',           
+                border: '1px solid #1a1a2e',
+                borderRadius: '20px',
+                padding: '5px 20px',
+                textDecoration: 'none',
+                transition: '0.3s'
+            }}>Accedi</Link>
+            <Link to="/register" className="btn btn-sm fw-bold"
+              style={{
+                backgroundColor: '#198755',
+                color: '#ffffff',        
+                border: '1px solid #1a1a2e',
+                borderRadius: '20px',
+                padding: '5px 20px',
+                textDecoration: 'none'
+            }}>Registrati</Link>
           </div>
         )}
       </div>

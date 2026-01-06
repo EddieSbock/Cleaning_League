@@ -123,7 +123,7 @@ const TaskMarket = () => {
                       disabled={selectedTask.is_taken_by_me || selectedTask.taken_seats >= selectedTask.max_assignees}
                        style={{background: (selectedTask.is_taken_by_me || selectedTask.taken_seats >= selectedTask.max_assignees) 
                         ? '#555' 
-                        : '#00fff5',
+                        : '#e94560cc',
                         cursor: (selectedTask.is_taken_by_me || selectedTask.taken_seats >= selectedTask.max_assignees)
                         ? 'not-allowed'
                         : 'pointer'

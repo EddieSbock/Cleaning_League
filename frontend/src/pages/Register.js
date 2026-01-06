@@ -21,31 +21,97 @@ function Register() {
     }
   };
 
+  const cardStyle = {
+    backgroundColor: '#1a1a2e', // Sfondo molto scuro quasi nero
+    border: '2px solid #800000',              // Bordo Rosso Scuro
+    borderRadius: '15px',
+    boxShadow: '0 0 20px rgba(139, 0, 0, 0.3)', // Alone rosso leggero
+    color: '#eac66eff',                         // Testo
+    width: '400px'
+  };
+
+  const inputStyle = {
+    backgroundColor: '#0f0f1a',   // Sfondo input
+    border: '1px solid #eac66eff',  // Bordo
+    color: '#eac66eff',               // Testo digitato
+    borderRadius: '8px'
+  };
+
+  const buttonStyle = {
+    backgroundColor: '#800000',   // Bottone Rosso Scuro
+    border: 'none',
+    color: 'white',
+    fontWeight: 'bold',
+    padding: '10px',
+    borderRadius: '8px',
+    marginTop: '10px',
+    transition: '0.3s'
+  };
+
   return (
-    <div className="d-flex justify-content-center mt-5">
-      <div className="card shadow p-4" style={{ width: '400px' }}>
-        <h2 className="text-center mb-4">Nuovo Membro</h2>
+    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '80vh' }}>
+      <div className="card p-5" style={cardStyle}>
+        
+        <h2 className="text-center mb-4" style={{ textTransform: 'uppercase', letterSpacing: '2px', textShadow: '0 0 10px #800000' }}>
+          Nuovo Membro
+        </h2>
+
         <form onSubmit={handleRegister}>
+          
           <div className="mb-3">
-            <label>Username</label>
-            <input type="text" className="form-control" 
-              value={username} onChange={(e) => setUsername(e.target.value)} required />
+            <label className="form-label fw-bold">Username</label>
+            <input 
+              type="text" 
+              className="form-control" 
+              style={inputStyle}
+              value={username} 
+              onChange={(e) => setUsername(e.target.value)} 
+              required 
+            />
           </div>
+
           <div className="mb-3">
-            <label>Email</label>
-            <input type="email" className="form-control" 
-              value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <label className="form-label fw-bold">Email</label>
+            <input 
+              type="email" 
+              className="form-control" 
+              style={inputStyle}
+              value={email} 
+              onChange={(e) => setEmail(e.target.value)} 
+              required 
+            />
           </div>
-          <div className="mb-3">
-            <label>Password</label>
-            <input type="password" className="form-control" 
-              value={password} onChange={(e) => setPassword(e.target.value)} required />
+
+          <div className="mb-4">
+            <label className="form-label fw-bold">Password</label>
+            <input 
+              type="password" 
+              className="form-control" 
+              style={inputStyle}
+              value={password} 
+              onChange={(e) => setPassword(e.target.value)} 
+              required 
+            />
           </div>
-          <button type="submit" className="btn btn-success w-100">Registrati</button>
+
+          <button 
+            type="submit" 
+            className="btn w-100" 
+            style={buttonStyle}
+            onMouseOver={(e) => e.target.style.backgroundColor = '#a30000'} 
+            onMouseOut={(e) => e.target.style.backgroundColor = '#800000'}
+          >
+            REGISTRATI ORA
+          </button>
         </form>
-        <p className="mt-3 text-center">
-          Hai già un account? <Link to="/login">Accedi</Link>
-        </p>
+        
+        <div className="mt-4 text-center">
+          <span style={{color: 'rgba(255,255,255,0.6)'}}>Hai già un account? </span>
+          <Link to="/login" style={{ color: '#ffd700', textDecoration: 'none', fontWeight: 'bold' }}>
+            Accedi
+          </Link>
+        </div>
+
       </div>
     </div>
   );
