@@ -8,33 +8,33 @@
 
 .admin-header {
     text-align: center;
-    color: #ffd700; 
+    color: #eac66eff; 
     margin-bottom: 30px;
     text-transform: uppercase;
     letter-spacing: 2px;
     font-size: 1.8rem;
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+    text-shadow: 0 0 10px rgba(255, 217, 0, 0.555);
 }
 
 
 .admin-card {
-    background: linear-gradient(145deg, #1e1e2f, #252538); 
-    border: 1px solid #444;
+    background: linear-gradient(145deg, #0f0f1a, #21213a); 
+    border: 1px solid #eac66eff;
     border-radius: 16px;
     padding: 25px;
     margin-bottom: 25px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.4); 
+    box-shadow: 0 8px 20px rgba(0,0,0,0.6); 
     position: relative;
     overflow: hidden; 
 }
 
 
 .admin-card h2 {
-    color: #00fff5; 
+    color: #eac66eff; 
     margin-top: 0;
     margin-bottom: 20px;
     font-size: 1.4rem;
-    border-bottom: 1px solid rgba(0, 255, 245, 0.2);
+    border-bottom: 1px solid rgb(234, 198, 110, 0.5);
     padding-bottom: 10px;
     display: flex;
     align-items: center;
@@ -128,11 +128,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     display: flex;
     justify-content: space-between; 
     align-items: center;
-    background: #16213e;
+    background: rgb(0, 0, 0, 0.3);
     padding: 10px 15px;
     margin-bottom: 8px;
     border-radius: 6px;
-    border-left: 3px solid #00fff5; 
+    border-left: 3px solid #eac66eff; 
     animation: fadeIn 0.3s ease;
 }
 
@@ -166,7 +166,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 /* bottoncino per obiettivi secondari */
 .btn-small {
-    background: #00fff5;
+    background: #eac66eff;
     border: none;
     border-radius: 8px;
     width: 50px; 
@@ -177,7 +177,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.2s;
+    transition: 0.2s;
 }
 
 .btn-small:hover {

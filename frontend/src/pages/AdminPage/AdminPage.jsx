@@ -6,9 +6,10 @@ import authService from '../../services/auth';
 const AdminPage = () => {
     
     const [activeSession, setActiveSession] = useState(null);
+    const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState(''); //è vuoto, bisogna metterci una data di fine
     const [isAdmin, setIsAdmin] = useState(false);
-    
+    const [houseId, setHouseId] = useState(null);
     // stato per nuova task
     const [newTask, setNewTask] = useState({
         title: '',
@@ -23,8 +24,10 @@ const AdminPage = () => {
     // carimaneto iniziale
     useEffect(() => {
         const initData = async () => {
-            await checkAdminStatus();
-            await fetchSessionStatus();
+            const myHouseId = await checkAdminStatus();
+            if (myHouseId) {
+            await fetchSessionStatus(myHouseId);
+            }
         };
         initData();
     }, []);
@@ -67,6 +70,8 @@ const AdminPage = () => {
             if (houseRes.data.length > 0) {
                 const myHouse = houseRes.data[0];
 
+                setHouseId(myHouse.id);
+
                 console.log("Dati Casa:", myHouse);
                 console.log("Confronto: admin ID (" + myHouse.admin + ") vs user ID (" + myId + ")");
             
@@ -76,17 +81,23 @@ const AdminPage = () => {
             } else {
                 setIsAdmin(false);  
             }
+
+            return myHouse.id;
         }
+        return null;
         } catch (error) {
             console.error("Errore verifica admin", error);
+            return null;
         }
     };
 
-    const fetchSessionStatus = async () => {
+    const fetchSessionStatus = async (specificHouseId = null) => {
         try {
+            const idToUse = specificHouseId || houseId;
+            if (!idToUse) return;
             const res = await api.get('sessions/');
             // Cerca se c'è una sessione attiva
-            const current = res.data.find(s => s.is_active);
+            const current = res.data.find(s => s.is_active && s.house === idToUse);
             setActiveSession(current);
         } catch (error) {
             console.error("Errore check sessione", error);
@@ -94,18 +105,31 @@ const AdminPage = () => {
     };
 
     const handleStartSession = async () => {
-      if (!endDate) {
-        alert("Seleziona una data di fine!");
+      if (!startDate || !endDate) {
+        alert("Seleziona una data di inizio e fine!");
         return;
     }
 
+    if (startDate > endDate) {
+          alert("La data di inizio non può essere dopo la data di fine!");
+          return;
+      }
+
+    if (!houseId) {
+          alert("Errore: ID Casa non trovato. Ricarica la pagina.");
+          return;
+      }
+
     try {
-        //imposta l'orario di fine giornata alle 23:59
-        const formattedDate = `${endDate}T23:59:00`;
+
+        const formattedStartDate = `${startDate}T00:00:00`;
+        const formattedEndDate = `${endDate}T23:59:00`;
 
         await api.post('sessions/', {
             is_active: true,
-            end_time: formattedDate 
+            start_time: formattedStartDate,
+            end_time: formattedEndDate,
+            house: houseId
         });
             
             alert('⏱️ Nuova Sessione Avviata!');
@@ -190,7 +214,7 @@ const AdminPage = () => {
                 
                 {activeSession ? (
                     <div className="session-active-msg">
-                        <p style={{color: '#00ff00', fontWeight: 'bold', fontSize: '1.2rem'}}> 
+                        <p style={{color: '#00ff00e1', fontWeight: 'bold', fontSize: '1.2rem'}}> 
                             SESSIONE ATTIVA (ID: {activeSession.id})</p>
                         <small>Scade il: {new Date(activeSession.end_time).toLocaleDateString()}</small>
 
@@ -199,9 +223,9 @@ const AdminPage = () => {
                                 <button 
                                     className="btn-action" 
                                     onClick={handleStopSession}
-                                    style={{backgroundColor: '#800000', border: '1px solid red'}}
+                                    style={{backgroundColor: '#e74d3ccb'}}
                                 >
-                                    🛑 TERMINA SESSIONE ORA
+                                    TERMINA SESSIONE ORA
                                 </button>
                             </div>
                         )}
@@ -211,6 +235,17 @@ const AdminPage = () => {
                         {isAdmin ? (
                             <>
                                 <p className="info-text">Nessuna sessione attiva. Avviane una per permettere ai coinquilini di giocare.</p>
+                                <div className="form-group">
+                                    <label>Data di Inizio</label>
+                                    <input 
+                                        type="date" 
+                                        className="admin-input"
+                                        value={startDate}
+                                        onChange={(e) => setStartDate(e.target.value)}
+                                        min={new Date().toISOString().split("T")[0]} 
+                                    />
+                                </div>
+
                                 <div className="form-group">
                                     <label>Data di fine sessione </label>
                                     <input 
@@ -285,7 +320,7 @@ const AdminPage = () => {
 
                     {/* Sezione per obiettivi secondari */}
                     <div className="subtasks-section">
-                        <label style={{color: '#00fff5'}}> Obiettivi Secondari (Subtasks)</label>
+                        <label style={{color: '#eac66eff'}}> Obiettivi Secondari (Subtasks)</label>
                         
                         <div className="subtasks-list">
                             {subtasksList.map((sub, index) => (
