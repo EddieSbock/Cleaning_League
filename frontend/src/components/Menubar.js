@@ -86,8 +86,8 @@ function Menubar() {
               <Link to="/task-market" style={getLinkStyle('/task-market')}>
                       Missioni
                   </Link>
-              <Link to="/profile" style={getLinkStyle('/profile')}>
-                      Profilo
+              <Link to="/admin" style={getLinkStyle('/admin')}>
+                      League
                   </Link>
             </div>
         )}
