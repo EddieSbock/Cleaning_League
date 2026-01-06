@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import api from '../../services/api';
 import './ProfileStyle.css';
+import defaultavatar from '../../assets/avatardefault.jpg';
 
 const ProfilePage = () => {
     // Stati per i dati
@@ -121,7 +122,7 @@ const ProfilePage = () => {
                     <div className="avatar-wrapper">
                         {/* Immagine*/}
                         <img 
-                            src={avatarPreview || "https://via.placeholder.com/150?text=No+Avatar"} 
+                            src={avatarPreview || defaultavatar}
                             alt="Avatar Profilo" 
                             className="avatar-image"
                         />

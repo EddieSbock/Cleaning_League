@@ -4,6 +4,8 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import authService from '../services/auth';
 import api from '../services/api';
 import logoImg from '../assets/Logo CL rosso grande.png';
+import defaultavatar from '../assets/avatardefault.jpg';
+
 
 function Menubar() {
   const navigate = useNavigate();
@@ -98,7 +100,7 @@ function Menubar() {
               {/* Avatar e Nome */}
               <Link to="/profile" className="d-flex align-items-center text-decoration-none gap-2 text-white">
                   <img 
-                    src={avatarUrl || "https://via.placeholder.com/40?text=U"} 
+                    src={avatarUrl || defaultavatar} 
                     alt="user" 
                     style={{
                         width: '35px', 
