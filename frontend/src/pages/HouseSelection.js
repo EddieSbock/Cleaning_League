@@ -49,7 +49,7 @@ function HouseSelection() {
       <div className="selection-card">
         
         <h2 className="selection-title">
-            {mode === 'initial' && "Scegli il tuo Destino"}
+            {mode === 'initial' && "Ti serve una Casa"}
             {mode === 'join' && "Unisciti alla Squadra"}
             {mode === 'create' && "Fonda una Nuova Lega"}
         </h2>
