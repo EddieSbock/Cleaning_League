@@ -1,0 +1,162 @@
+.selection-container {
+    min-height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* LA SCHEDA CENTRALE (Vetro Scuro) */
+.selection-card {
+    background: rgba(20, 20, 35, 0.9);
+    border: 2px solid #333; /* Bordo base */
+    box-shadow: 0 0 40px rgba(0,0,0,0.8);
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%;
+    max-width: 600px;
+    position: relative;
+    backdrop-filter: blur(10px);
+    color: white;
+}
+
+.selection-title {
+    text-align: center;
+    color: #ffd700; /* Oro */
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+}
+
+/* ERRORI */
+.error-msg {
+    background: rgba(255, 0, 0, 0.2);
+    border: 1px solid #ff4d4d;
+    color: #ffcccc;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+
+.options-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.big-option-btn {
+    padding: 25px;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid transparent;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.big-option-btn:hover {
+    transform: scale(1.02);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.btn-join {
+    border-color: #00fff5;
+    box-shadow: 0 0 10px rgba(0, 255, 245, 0.1);
+}
+.btn-join:hover {
+    box-shadow: 0 0 25px rgba(0, 255, 245, 0.3);
+}
+.btn-join h3 { color: #00fff5; margin: 0; font-size: 1.3rem; }
+.btn-join small { color: #aaa; font-size: 0.9rem; }
+
+
+.btn-create {
+    border-color: #e94560;
+    box-shadow: 0 0 10px rgba(233, 69, 96, 0.1);
+}
+.btn-create:hover {
+    box-shadow: 0 0 25px rgba(233, 69, 96, 0.3);
+}
+.btn-create h3 { color: #e94560; margin: 0; font-size: 1.3rem; }
+.btn-create small { color: #aaa; font-size: 0.9rem; }
+
+.form-section {
+    animation: fadeIn 0.4s ease;
+}
+
+.input-label {
+    display: block;
+    color: #00fff5;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.custom-input {
+    width: 100%;
+    padding: 15px;
+    background: #0f0f1a;
+    border: 1px solid #444;
+    border-radius: 10px;
+    color: white;
+    font-size: 1.1rem;
+    outline: none;
+    margin-bottom: 25px;
+    transition: 0.3s;
+    text-align: center; 
+}
+
+.custom-input:focus {
+    border-color: #ffd700;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+}
+
+.hint-text {
+    color: #666;
+    font-size: 0.85rem;
+    margin-top: -15px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.actions-row {
+    display: flex;
+    gap: 15px;
+}
+
+.action-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.confirm-join { background: #00fff5; color: #000; }
+.confirm-join:hover { background: white; box-shadow: 0 0 15px #00fff5; }
+
+.confirm-create { background: #e94560; color: white; }
+.confirm-create:hover { background: #ff2e63; box-shadow: 0 0 15px #e94560; }
+
+.btn-back {
+    background: transparent;
+    border: 1px solid #555;
+    color: #aaa;
+}
+.btn-back:hover { border-color: white; color: white; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
