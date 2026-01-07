@@ -5,7 +5,8 @@
     margin: 0;
     padding: 20px;
     height: 70vh;
-    overflow: hidden; 
+    overflow: auto; 
+    min-height: 100vh;
 }
 
 .grid-container {
@@ -22,6 +23,7 @@
     border: 1px solid #eac66eff;
     border-radius: 10px;
     padding: 15px;
+    box-shadow: 0 0 10px #eac66eff;
     cursor: pointer;
     transition: transform 0.3s, box-shadow 0.3s;
     position: relative;
@@ -68,7 +70,7 @@
     top: 80px;
     right: 20px;
     width: 280px;
-    background: rgba(0, 0, 0, 0.8);
+    background: #0f0f1ad5;
     border: 2px solid #e94560cc;
     padding: 20px;
     border-radius: 10px;
@@ -110,11 +112,14 @@
     right: 20px;
     width: 300px;
     height: 150px;
-    background: #1a1a2e;
-    border: 2px dashed #4d1c01;
+    background: #0f0f1ad5;
+    border: 2px dashed #e94560cc;
+    box-shadow: 0 0 20px #e9456073;
     border-radius: 10px;
-    padding: 10px;
+    padding: 15px;
     overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #e9456000 transparent;
 }
 
 
@@ -124,4 +129,5 @@
     margin-bottom: 5px;
     border-left: 3px solid rgb(173, 141, 58);
     font-size: 0.8rem;
+    color: #0f0f1a;
 }

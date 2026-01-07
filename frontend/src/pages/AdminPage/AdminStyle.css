@@ -181,7 +181,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .btn-small:hover {
-    background: #00dcd3;
+    background: #ffed4a;
+    transform: scale(1.1);
 }
 
 /* bottone per rimuovere */
@@ -198,6 +199,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .btn-remove:hover {
     color: #ff0000;
+    transform: scale(1.1);
 }
 
 
