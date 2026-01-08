@@ -128,7 +128,7 @@ class RatingSerializer(serializers.ModelSerializer):
 class AssignmentSerializer(serializers.ModelSerializer):
     task_title = serializers.ReadOnlyField(source='task.title')
     assignee_name = serializers.ReadOnlyField(source='assigned_to.nickname')
-    
+    xp_reward = serializers.ReadOnlyField(source='task.xp_reward')
     ratings = RatingSerializer(many=True, read_only=True)
 
     class Meta:

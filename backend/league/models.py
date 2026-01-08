@@ -112,15 +112,16 @@ class Assignment(models.Model):
     def calculate_bonus(self):
 
         if not self.completed_at:
-            return 0
+            self.completed_at = timezone.now()
             
         session = self.task.session
-        now = timezone.now()
+        now = self.completed_at
         
         score = self.task.xp_reward
         
         if now <= session.end_time:
             total_duration = (session.end_time - session.start_time).total_seconds()
+            total_duration = max(1, total_duration)
         
             time_elapsed = (now - session.start_time).total_seconds()
             time_elapsed = max(0, time_elapsed)
@@ -133,13 +134,34 @@ class Assignment(models.Model):
             score = score + bonus
         
         self.earned_xp = score
-        self.completed_at = now
-        self.status = 'COMPLETED'
-        self.save()
         return score
+    
+    def save(self, *args, **kwargs):
+        
+        if self.pk:
+            try:
+                old_assignment = Assignment.objects.get(pk=self.pk)
+                old_status = old_assignment.status
+            except Assignment.DoesNotExist:
+                old_status = 'TODO' 
+            
+            
+            if self.status == 'COMPLETED' and old_status != 'COMPLETED':
+                
+                self.calculate_bonus()
+                
+             
+                profile = self.assigned_to
+               
+                profile.total_xp += self.earned_xp
+                profile.save() 
+                
+                print(f"Punti assegnati a {profile.nickname}: {self.earned_xp} XP")
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.task.title} -> {self.assigned_to.nickname}"
+        return f"{self.task.title} -> {self.assigned_to.nickname} ({self.status})"
     
 class Rating(models.Model):
     

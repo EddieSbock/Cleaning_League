@@ -7,133 +7,193 @@ import './Dashboard.css';
 const Dashboard = () => {
   const [house, setHouse] = useState(null);
   const [session, setSession] = useState(null);
-  const [tasks, setTasks] = useState([]);
   const [myAssignments, setMyAssignments] = useState([]);
   const [members, setMembers] = useState([]);
   const [timeLeft, setTimeLeft] = useState("");
   const [loading, setLoading] = useState(true);
   
-  const [view, setView] = useState('available');
-  
   const navigate = useNavigate();
 
-// caricamento iniziale
-  useEffect(() => {
-    const fetchData = async () => {
+  // Helper ID Utente per capire chi sono "IO"
+  const getUserId = () => {
+      const userToken = authService.getCurrentUser();
+      if (!userToken) return null;
+      if (userToken.user_id) return userToken.user_id;
       try {
+          const base64Url = userToken.split('.')[1];
+          const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+          const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+          return JSON.parse(jsonPayload).user_id;
+      } catch (e) { return null; }
+  };
+  const myId = getUserId();
+
+  // 1. CARICAMENTO DATI
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+      try {
+        // Scarica Casa e Membri
         const houseReq = await api.get('houses/');
+        if (houseReq.data.length === 0) {
+            setLoading(false);
+            return; // Nessuna casa
+        }
         const myHouse = houseReq.data[0];
         setHouse(myHouse);
 
-        if (myHouse) {
-            if (myHouse.members) {
-                console.log("Membri trovati nella casa:", myHouse.members);
-                setMembers(myHouse.members);
-            } else {
-                console.warn("Attenzione: il campo 'members' non è arrivato dal backend.");
-            }
+        // Se i membri sono popolati
+        if (myHouse.members) {
+            setMembers(myHouse.members);
         }
 
+        // Scarica Sessione Attiva
         const sessionsReq = await api.get('sessions/');
-        const activeSession = sessionsReq.data.find(s => s.is_active);
+        const activeSession = sessionsReq.data.find(s => s.is_active && s.house === myHouse.id);
         setSession(activeSession);
 
         if (activeSession) {
-          refreshTasks(activeSession.id);
+          refreshMyTasks(activeSession.id);
         }
 
         setLoading(false);
       } catch (error) {
-        console.error("Errore caricamento dashboard:", error);
-        
-      
-        if (error.response && error.response.status === 401) {
-            localStorage.removeItem('access');
-            alert("Sessione scaduta, rifai il login!");
-            navigate('/login'); 
+        console.error("Errore Dashboard:", error);
+        if (error.response?.status === 401) {
+            authService.logout();
+            navigate('/login');
         }
         setLoading(false);
       }
-    };
-    fetchData();
-  }, [navigate]);
-
-    const refreshTasks = async (sessionId) => {
-      try {
-        const tasksReq = await api.get('tasks/');
-        const sessionTasks = tasksReq.data.filter(t => t.session === sessionId);
-        setTasks(sessionTasks);
-
-        const assignReq = await api.get('assignments/');
-        // Filtra solo quelle non completate dell'utente corrente
-        setMyAssignments(assignReq.data.filter(a => a.status === 'TODO')); 
-    } catch (error) {
-        console.error("Errore refresh task", error);
-    }
   };
 
-  // Timer
+  const refreshMyTasks = async (sessionId) => {
+      try {
+          const assignReq = await api.get('assignments/');
+          
+          console.log("Assignments scaricati:", assignReq.data);
+
+        
+          const validAssignments = assignReq.data.filter(a => a.status === 'TODO');
+
+          setMyAssignments(validAssignments);
+      } catch (error) {
+          console.error("Errore refresh tasks:", error);
+      }
+  };
+
+  // 2. TIMER FIX
   useEffect(() => {
     if (!session) return;
-    const interval = setInterval(() => {
+    
+    const calculateTime = () => {
       const now = new Date();
       const end = new Date(session.end_time);
       const diff = end - now;
 
       if (diff <= 0) {
-        setTimeLeft("SESSIONE TERMINATA");
-        clearInterval(interval);
-      } else {
-        const minutes = Math.floor((diff / 1000 / 60) % 60);
-        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-        setTimeLeft(`${hours}h ${minutes}m`);
+        setTimeLeft("00:00");
+        return;
       }
-    }, 60000);
+      
+      const hours = Math.floor((diff / (1000 * 60 * 60)));
+      const minutes = Math.floor((diff / 1000 / 60) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+      
+      const hStr = hours > 0 ? `${hours}h ` : '';
+      const mStr = minutes.toString().padStart(2, '0');
+      const sStr = seconds.toString().padStart(2, '0');
+      
+      setTimeLeft(`${hStr}${mStr}:${sStr}`);
+    };
+
+    calculateTime();
+    const interval = setInterval(calculateTime, 1000);
     return () => clearInterval(interval);
   }, [session]);
 
  
- //per il logout
-  const handleLogout = () => {
-  
-    if (authService.logout) {
-        authService.logout();
-    } else {
-        localStorage.removeItem('token');
-    }
-    navigate('/login');
+  const handleLeaveHouse = async () => {
+      const confirm = window.confirm("⚠️ ATTENZIONE: Sei sicuro di voler abbandonare questa casa? Dovrai farti invitare di nuovo per rientrare.");
+      if (confirm) {
+          try {
+            
+              await api.post(`houses/leave/`, { house_id: house.id }); 
+              localStorage.removeItem('houseId');
+              alert("Hai abbandonato la casa.");
+              window.location.href = '/house-selection'; 
+          } catch (e) {
+              console.error(e);
+              alert("Errore: impossibile abbandonare la casa al momento.");
+          }
+      }
   };
 
- // Azioni Pulsanti
-  const handleGrabTask = async (taskId) => {
-    try {
-      await api.post(`tasks/${taskId}/grab/`);
-      alert("Task presa!");
-      setView('mine');
-      if(session) refreshTasks(session.id);
-    } catch (error) {
-      alert("Errore: " + (error.response?.data?.error || "Impossibile prendere la task"));
-    }
-  };
-
+  // 4. COMPLETAMENTO TASK
   const handleCompleteTask = async (assignmentId) => {
+    const confirm = window.confirm("Hai davvero completato questa missione?");
+    if (!confirm) return;
+
     try {
       const res = await api.post(`assignments/${assignmentId}/complete/`);
-      setMyAssignments(prev => prev.filter(task => task.id !== assignmentId));
-      alert(`Grande! Hai guadagnato ${res.data.earned_xp} XP!`);
+      
+      const pointsEarned = res.data.earned_xp;
+
+      alert(`🎉 MISSIONE COMPIUTA!\nHai guadagnato ${pointsEarned} XP!`);
+      
+      setMyAssignments(prev => prev.filter(a => a.id !== assignmentId));
+
+
+      setMembers(prevMembers => prevMembers.map(m => {
+          if (String(m.id) === String(myId)) {
+              return { ...m, total_xp: m.total_xp + pointsEarned };
+          }
+          return m;
+      }));
+      
+      setTimeout(() => {
+          fetchData(); 
+      }, 1000);
+
     } catch (error) {
       console.error(error);
-      alert("Errore nel completamento");
+      alert("Errore: " + (error.response?.data?.error || "Impossibile completare."));
     }
   };
-  if (loading) return <div className="loading-screen">Caricamento...</div>;  
+
+  const renderAvatar = (member) => {
+  //???????
+    if (member.avatar) {
+        const imageUrl = member.avatar.startsWith('http') ? member.avatar : `http://127.0.0.1:8000${member.avatar}`;
+        return <img src={imageUrl} alt={member.nickname} className="avatar-img" />;
+    }
+    // Altrimenti avatar generico
+    return (
+        <div className="avatar-placeholder">
+            {member.nickname.charAt(0).toUpperCase()}
+        </div>
+    );
+  };
+
+  if (loading) return <div className="loading-screen">Caricamento Dashboard...</div>;  
   
   if (!house) return (
     <div className="error-screen">
-        <p>Non fai parte di nessuna casa!</p>
-        <button onClick={handleLogout}>Esci</button>
+        <h2>Senza Fissa Dimora?</h2>
+        <p>Non fai parte di nessuna casa.</p>
+        <button className="btn-primary" onClick={() => {
+            localStorage.removeItem('houseId');
+            window.location.href = '/house-selection';
+        }}>Unisciti o Crea</button>
     </div>
   );
+
+  // Classifica
+  const sortedMembers = [...members].sort((a, b) => b.total_xp - a.total_xp);
+  const podium = sortedMembers.slice(0, 3);
+  const others = sortedMembers.slice(3);
 
   return (
     <div className="dashboard-container">
@@ -141,110 +201,155 @@ const Dashboard = () => {
       {/* SIDEBAR SINISTRA */}
       <aside className="sidebar">
         <div className="house-header">
-          <h2>🏠 {house.name}</h2>
-          <p className="invite-code">Codice: <code>{house.invite_code}</code></p>
+          <h2>{house.name}</h2>
+          <div className="invite-box">
+             <small>Codice Invito: </small>
+             <code>{house.invite_code}</code>
+          </div>
         </div>
         
         <div className="members-list">
              <h3>Squadra</h3>
              <ul>
-                {members.map(m => (
-                    <li key={m.id} className="member-item">
-                        <div className="avatar-circle">{m.nickname.charAt(0)}</div>
-                        <div className="member-info">
-                          <span className="name">{m.nickname}</span>
-                          <span className="level">Lvl. {m.level}</span>
-                        </div>
-                    </li>
-                ))}
+                {sortedMembers.map(m => {
+                    const isMe = String(m.id) === String(myId);
+                    return (
+                        <li key={m.id} className={`member-item ${isMe ? 'is-me' : ''}`}>
+                            {renderAvatar(m)}
+                            <div className="member-info">
+                              <span className="name">
+                                  {m.nickname} 
+                                  {isMe && <span className="me-badge"> (TU)</span>}
+                              </span>
+                              <span className="xp-badge-mini">{m.total_xp} XP</span>
+                            </div>
+                        </li>
+                    );
+                })}
              </ul>
         </div>
 
-
-        <div style={{marginTop: 'auto', paddingTop: '20px'}}>
-            <button 
-                onClick={handleLogout} 
-                style={{width:'100%', padding:'10px', background:'#e74c3c', color:'white', border:'none', cursor:'pointer'}}>
-                Esci
+        {/* TASTO ABBANDONA (Sostituisce Logout) */}
+        <div className="sidebar-footer">
+            <button onClick={handleLeaveHouse} className="btn-leave-house">
+                ⚠️ Abbandona Casa
             </button>
         </div>
       </aside>
 
-
-
+      {/* CONTENUTO PRINCIPALE */}
       <main className="main-content">
+        
         <header className="dashboard-header">
-          <div>
-            <h1>{session ? session.name : "Nessuna Pulizia in Corso zzz..."}</h1>
-            {session && <p>Corri per il bonus velocità!</p>}
+          <div className="header-text">
+            <h1>{session ? "Sessione in Corso" : "💤 Nessuna attività"}</h1>
+            {session && <p className="subtitle">Mancano poche ore! Corri a pulire!</p>}
           </div>
-          {session && (
-            <div className="timer-card">
-                <span className="timer-icon">⏳</span>
-                <span className="time-remaining">{timeLeft || "--:--"}</span>
+          
+          {session ? (
+            <div className="timer-box pulsating">
+                <span className="timer-label">TEMPO RIMASTO</span>
+                <span className="timer-digits">{timeLeft}</span>
+            </div>
+          ) : (
+            <div className="timer-box inactive">
+                <span>OFFLINE</span>
             </div>
           )}
         </header>
 
         {session ? (
-            <div className="grid-layout">
+            <div className="dashboard-grid">
                 
-                {/* per le task */}
-<div className="card task-widget-fixed">
-                <div className="widget-header">
-                    <h3>Le mie Task Attive</h3>
-                </div>
+                {/* COLONNA SINISTRA: LE MIE TASK */}
+                <div className="tasks-column">
+                    <div className="section-title">
+                        <h3>📋 Le mie Missioni</h3>
+                        <button className="btn-market" onClick={() => navigate('/task-market')}>
+                            + Nuova
+                        </button>
+                    </div>
 
-                <div className="task-list-simple-scroll">
-                    {myAssignments.length > 0 ? (
-                        <ul>
-                            {myAssignments.map(assign => (
-                                <li key={assign.id} className="simple-task-item">
-                                    <div className="task-text">
-                                        <span className="t-title">{assign.task_title || `Task #${assign.task}`}</span>
-                                        <span className="t-status">In corso</span>
+                    <div className="my-tasks-list">
+                        {myAssignments.length > 0 ? (
+                            myAssignments.map(assign => (
+                                <div key={assign.id} className="task-card-row">
+                                    <div className="task-info">
+                                        <h4>{assign.task_title}</h4>
+                                        <span className="xp-tag">+{assign.task.xp_reward} XP</span>
                                     </div>
                                     <button 
-                                        className="btn-check-mini" 
+                                        className="btn-complete-task"
                                         onClick={() => handleCompleteTask(assign.id)}
-                                        title="Segna come fatto"
-                                    >✓</button>
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <div className="empty-state-text">
-                            <p>Non hai task in corso.</p>
-                            <small>Vai a prenderne una!</small>
-                        </div>
-                    )}
+                                    >
+                                        COMPLETA
+                                    </button>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="empty-state">
+                                <span style={{fontSize:'2rem'}}>🤷‍♂️</span>
+                                <p>Non hai missioni attive.</p>
+                                <small>Vai al mercato per prenderne una!</small>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
-                <button 
-                    className="btn-go-tasks" 
-                    onClick={() => navigate('/task-market')} 
-                >
-                    Cerca nuove Task →
-                </button>
-            </div>
+                {/* COLONNA DESTRA: CLASSIFICA */}
+                <div className="leaderboard-column">
+                    <h3>🏆 Classifica</h3>
+                    
+                    {/* PODIO */}
+                    <div className="podium">
+                        {/* 2° Posto */}
+                        {podium[1] && (
+                            <div className="podium-place silver">
+                                {renderAvatar(podium[1])}
+                                <span className="rank-num">2</span>
+                                <span className="p-name">{podium[1].nickname}</span>
+                                <span className="p-xp">{podium[1].total_xp}</span>
+                            </div>
+                        )}
+                        
+                        {/* 1° Posto */}
+                        {podium[0] && (
+                            <div className="podium-place gold">
+                                {renderAvatar(podium[0])}
+                                <span className="rank-num">1</span>
+                                <span className="crown">👑</span>
+                                <span className="p-name">{podium[0].nickname}</span>
+                                <span className="p-xp">{podium[0].total_xp}</span>
+                            </div>
+                        )}
 
-                {/* CLASSIFICA TOTALE "test"*/}
-                <div className="card total-leaderboard">
-                    <h3>Classifica Casa</h3>
-                    <ul className="ranking-list">
-                        {members.sort((a, b) => b.total_xp - a.total_xp).map((m, index) => (
+                        {/* 3° Posto */}
+                        {podium[2] && (
+                            <div className="podium-place bronze">
+                                {renderAvatar(podium[2])}
+                                <span className="rank-num">3</span>
+                                <span className="p-name">{podium[2].nickname}</span>
+                                <span className="p-xp">{podium[2].total_xp}</span>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* LISTA ALTRI */}
+                    <ul className="other-ranks">
+                        {others.map((m, i) => (
                             <li key={m.id}>
-                                <span>{index + 1}. {m.nickname}</span>
-                                <strong>{m.total_xp} XP</strong>
+                                <span className="rank-pos">#{i + 4}</span>
+                                <span className="rank-name">{m.nickname}</span>
+                                <span className="rank-xp">{m.total_xp} XP</span>
                             </li>
                         ))}
                     </ul>
                 </div>
             </div>
         ) : (
-            <div className="no-session-msg">
-                <h3>Tutto pulito! (O forse no?)</h3>
-                <p>L'admin non ha avviato nessuna sessione di pulizie.</p>
+            <div className="no-session-hero">
+                <h2>La casa riposa... per ora.</h2>
+                <p>Attendere che l'Admin avvii una nuova sessione di pulizie.</p>
             </div>
         )}
       </main>

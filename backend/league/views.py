@@ -77,6 +77,30 @@ class HouseViewSet(viewsets.ModelViewSet):
         profile.save()
         serializer = self.get_serializer(house)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=['post'])
+    def leave(self, request):
+        try:
+        
+            profile = request.user.profile
+            
+            
+            if not profile.house:
+                return Response({'error': 'Non fai parte di nessuna casa!'}, status=status.HTTP_400_BAD_REQUEST)
+
+            
+            if profile.house.admin == request.user:
+                return Response({'error': 'Sei l\'Admin! Non puoi abbandonare la nave. Devi cancellare la casa.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        
+            house_name = profile.house.name
+            profile.house = None
+            profile.save()
+
+            return Response({'message': f'Hai abbandonato {house_name} con successo.'}, status=status.HTTP_200_OK)
+
+        except Profile.DoesNotExist:
+            return Response({'error': 'Profilo utente non trovato.'}, status=status.HTTP_404_NOT_FOUND)
 
 class ProfileViewSet(viewsets.ModelViewSet):
     
@@ -145,18 +169,19 @@ class AssignmentViewSet(viewsets.ModelViewSet):
         assignment = self.get_object()
         
         assignment.completed_at = timezone.now()
-        assignment.save()
     
         if assignment.status == 'COMPLETED':
             return Response({'error': 'Task già completata!'}, status=400)
             
         if assignment.assigned_to.user != request.user:
             return Response({'error': 'Non è la tua task!'}, status=403)
-
-        points = assignment.calculate_bonus()
+        
+        assignment.status = 'COMPLETED'
+        assignment.save() 
+        
         return Response({
             'status': 'Task completata!',
-            'earned_xp': points,
+            'earned_xp': assignment.earned_xp,
             'completed_at': assignment.completed_at
         })
 

@@ -25,7 +25,7 @@ function Register() {
     backgroundColor: '#1a1a2e', // Sfondo molto scuro quasi nero
     border: '2px solid #800000',              // Bordo Rosso Scuro
     borderRadius: '15px',
-    boxShadow: '0 0 20px rgba(139, 0, 0, 0.3)', // Alone rosso leggero
+    boxShadow: '0 0 20px rgba(0, 0, 0, 0.8)',
     color: '#eac66eff',                         // Testo
     width: '400px'
   };
@@ -34,7 +34,8 @@ function Register() {
     backgroundColor: '#0f0f1a',   // Sfondo input
     border: '1px solid #eac66eff',  // Bordo
     color: '#eac66eff',               // Testo digitato
-    borderRadius: '8px'
+    borderRadius: '8px',
+    boxShadow: '0 0 10px rgba(235, 187, 67, 0.57)'
   };
 
   const buttonStyle = {
