@@ -1,9 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import User
 import django.utils.timezone as timezone
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 import random
 import string
 from django.core.validators import MinValueValidator, MaxValueValidator
+import math
 
 def generate_invite_code(length=8):
     characters = string.ascii_letters + string.digits    
@@ -33,6 +36,13 @@ class Profile(models.Model):
     total_xp = models.IntegerField(default=0)
     level = models.IntegerField(default=1)
     
+    def update_level(self):
+
+        new_level = int(math.sqrt(self.total_xp / 100)) + 1
+        if new_level > self.level:
+            self.level = new_level
+            self.save()
+            
     def __str__(self):
         return self.nickname if self.nickname else self.user.username
     
@@ -154,9 +164,13 @@ class Assignment(models.Model):
                 profile = self.assigned_to
                
                 profile.total_xp += self.earned_xp
+                
+                new_level = int(math.sqrt(profile.total_xp / 100)) + 1
+                if new_level > profile.level:
+                    profile.level = new_level
                 profile.save() 
                 
-                print(f"Punti assegnati a {profile.nickname}: {self.earned_xp} XP")
+                print(f"Punti assegnati a {profile.nickname}: {self.earned_xp} XP. Livello aggiornato a {profile.level}")
 
         super().save(*args, **kwargs)
 

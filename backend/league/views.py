@@ -157,13 +157,21 @@ class GameSessionViewSet(viewsets.ModelViewSet):
 class AssignmentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
+        user = self.request.user
+        
+        if self.action in ['rate', 'session_recap']:
+            
+            if hasattr(user, 'profile') and user.profile.house:
+                return Assignment.objects.filter(task__session__house=user.profile.house)
+            return Assignment.objects.none()
+
         return Assignment.objects.filter(
-            assigned_to__user=self.request.user,
+            assigned_to__user=user,
             completed_at__isnull=True 
         )
     serializer_class = AssignmentSerializer
 
-    #API con: POST /api/assignments/{ID}/complete/
+
     @action(detail=True, methods=['post'])
     def complete(self, request, pk=None):
         assignment = self.get_object()
@@ -184,7 +192,60 @@ class AssignmentViewSet(viewsets.ModelViewSet):
             'earned_xp': assignment.earned_xp,
             'completed_at': assignment.completed_at
         })
+        
+    @action(detail=False, methods=['get'])
+    def session_recap(self, request):
+        user = request.user
+        if not hasattr(user, 'profile') or not user.profile.house:
+            return Response([])
+        
+        house = user.profile.house
+        last_session = GameSession.objects.filter(house=house).order_by('id').last()
+        
+        if not last_session:
+            return Response([])
+        
+        completed_assignments = Assignment.objects.filter(
+            task__session=last_session,
+            status='COMPLETED'
+        ).order_by('-completed_at')
+        
+        from .serializers import AssignmentVotingSerializer 
+        
+        serializer = AssignmentVotingSerializer(completed_assignments, many=True)
+        return Response(serializer.data)
 
+    @action(detail=True, methods=['post'])
+    def rate(self, request, pk=None):
+        assignment = self.get_object()
+        
+        try:
+            assignment = Assignment.objects.get(pk=pk)
+        except Assignment.DoesNotExist:
+             return Response({'error': 'Assignment non trovato'}, status=404)
+
+        voter = request.user.profile
+        
+        if assignment.assigned_to == voter:
+            return Response({'error': 'Non puoi votarti da solo!'}, status=400)
+
+        stars = request.data.get('stars')
+        comment = request.data.get('comment', '')
+
+        if not stars:
+             return Response({'error': 'Devi dare un voto in stelle'}, status=400)
+
+        try:
+            Rating.objects.create(
+                voter=voter,
+                assignment=assignment,
+                stars=stars,
+                comment=comment
+            )
+            return Response({'status': 'Voto registrato!'})
+        except Exception as e:
+            return Response({'error': 'Hai già votato questa task.'}, status=400)
+        
 class RatingViewSet(viewsets.ModelViewSet):
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer

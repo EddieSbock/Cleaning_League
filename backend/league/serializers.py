@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import House, Profile, Task, SubTask, GameSession, Assignment, Rating
 from django.contrib.auth.models import User
+from django.db.models import Sum
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -9,9 +10,30 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'email']
         
 class MemberSerializer(serializers.ModelSerializer):
+    
+    session_xp = serializers.SerializerMethodField()
+    
     class Meta:
         model = Profile
-        fields = ['nickname', 'level', 'total_xp']
+        fields = ['nickname', 'level', 'total_xp', 'session_xp', 'avatar']
+        
+    def get_session_xp(self, obj):
+    
+        if not obj.house:
+            return 0
+            
+        active_session = obj.house.sessions.filter(is_active=True).first()
+        
+        if not active_session:
+            return 0
+            
+        points = Assignment.objects.filter(
+            assigned_to=obj,
+            task__session=active_session, #solo sessione attiva
+            status='COMPLETED'
+        ).aggregate(Sum('earned_xp'))['earned_xp__sum']
+        
+        return points or 0
         
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
@@ -43,7 +65,7 @@ class TaskSerializer(serializers.ModelSerializer):
     
     subtasks = SubTaskSerializer(many=True, read_only=True) # Include le subtask nel serializer principale
     
-    taken_seats = serializers.IntegerField(source='assignments_set.count', read_only=True)
+    taken_seats = serializers.IntegerField(source='assignment_set.count')
     is_taken_by_me = serializers.SerializerMethodField()
     session_start = serializers.DateTimeField(source='session.start_time', read_only=True)
     session_end = serializers.DateTimeField(source='session.end_time', read_only=True)
@@ -135,3 +157,22 @@ class AssignmentSerializer(serializers.ModelSerializer):
         model = Assignment
         fields = '__all__'
         read_only_fields = ['earned_xp', 'completed_at', 'status'] 
+
+class AssignmentVotingSerializer(serializers.ModelSerializer):
+    
+    task_title = serializers.ReadOnlyField(source='task.title')
+    assignee_name = serializers.ReadOnlyField(source='assigned_to.nickname')
+    assignee_avatar = serializers.ImageField(source='assigned_to.avatar', read_only=True)
+    
+    average_vote = serializers.SerializerMethodField()
+    ratings = RatingSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Assignment
+        fields = ['id', 'task_title', 'assignee_name', 'assignee_avatar', 'status', 'ratings', 'average_vote', 'earned_xp']
+
+    def get_average_vote(self, obj):
+        ratings = obj.ratings.all()
+        if not ratings: return 0
+        total = sum(r.stars for r in ratings)
+        return total / len(ratings)

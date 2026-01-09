@@ -296,3 +296,195 @@
     padding: 100px;
     color: #555;
 }
+
+/* --- SEZIONE VOTAZIONI --- */
+
+/* Contenitore principale lista */
+.voting-list-section {
+    max-width: 800px;
+    margin: 0 auto;
+    padding-bottom: 50px;
+}
+
+/* Card della singola Task */
+.voting-card {
+    background-color: #1a1a2e; /* Sfondo scuro leggermente diverso dal main */
+    border: 1px solid #333;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    transition: transform 0.2s ease;
+}
+
+.voting-card:hover {
+    border-color: #555;
+}
+
+/* Header della Card (Sempre visibile) */
+.voting-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    cursor: pointer;
+    background: linear-gradient(90deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 100%);
+}
+
+.voting-header:hover {
+    background-color: rgba(255,255,255,0.05);
+}
+
+/* Info Utente e Task nell'Header */
+.v-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.v-user {
+    color: #4cc9f0; /* Azzurro neon */
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.v-task {
+    color: #e0e0e0;
+    font-size: 0.95rem;
+}
+
+.v-task strong {
+    color: #fff;
+}
+
+/* Statistiche a destra (Stelle e Toggle) */
+.v-stats {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.v-stars {
+    color: #ffd700; /* Oro */
+    font-weight: bold;
+    font-size: 1.1rem;
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+}
+
+.btn-toggle {
+    background: #333;
+    color: #fff;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.btn-toggle:hover {
+    background: #444;
+}
+
+/* Dettagli Espandibili (Commenti e Form) */
+.voting-details {
+    border-top: 1px solid #333;
+    background-color: #161625;
+    padding: 20px;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Lista Commenti */
+.comments-list {
+    margin-bottom: 20px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.comment-item {
+    background: rgba(255,255,255,0.03);
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: #ccc;
+    border-left: 3px solid #666;
+}
+
+.comment-item strong {
+    color: #fff;
+    margin-right: 5px;
+}
+
+.comment-item small {
+    color: #ffd700;
+    margin-left: 8px;
+}
+
+/* Form di Voto */
+.vote-form {
+    border-top: 1px dashed #444;
+    padding-top: 15px;
+    margin-top: 10px;
+}
+
+.vote-form h4 {
+    margin-bottom: 10px;
+    color: #aaa;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.star-select {
+    padding: 10px;
+    background: #222;
+    border: 1px solid #444;
+    color: #ffd700;
+    border-radius: 6px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.comment-input {
+    padding: 10px;
+    background: #222;
+    border: 1px solid #444;
+    color: #fff;
+    border-radius: 6px;
+    flex-grow: 1;
+    margin-right: 10px;
+    width: 60%;
+}
+
+.comment-input:focus {
+    outline: none;
+    border-color: #4cc9f0;
+}
+
+.btn-submit-vote {
+    padding: 10px 20px;
+    background: #4cc9f0;
+    color: #000;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: background 0.2s;
+}
+
+.btn-submit-vote:hover {
+    background: #3db8dd;
+    box-shadow: 0 0 10px rgba(76, 201, 240, 0.4);
+}
