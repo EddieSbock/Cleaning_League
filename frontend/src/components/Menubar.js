@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import authService from '../services/auth';
 import api from '../services/api';
-import logoImg from '../assets/Logo CL rosso grande.png';
+import logoImg from '../assets/Logo CL.png';
 import defaultavatar from '../assets/avatardefault.jpg';
 
 
