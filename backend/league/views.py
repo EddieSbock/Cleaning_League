@@ -90,8 +90,11 @@ class HouseViewSet(viewsets.ModelViewSet):
 
             
             if profile.house.admin == request.user:
-                return Response({'error': 'Sei l\'Admin! Non puoi abbandonare la nave. Devi cancellare la casa.'}, status=status.HTTP_400_BAD_REQUEST)
-
+                house_to_delete = profile.house
+                profile.house = None
+                profile.save()
+                house_to_delete.delete()
+                return Response({'message': f'Essendo l\'admin, hai sciolto la casa {house_name}.'}, status=status.HTTP_200_OK)
         
             house_name = profile.house.name
             profile.house = None
