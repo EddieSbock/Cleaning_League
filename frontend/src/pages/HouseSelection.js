@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api'; // Usiamo api per fare le chiamate
-import authService from '../services/auth'; // Per aggiornare il localStorage
 import '../pages/HouseSelection.css';
 
 function HouseSelection() {

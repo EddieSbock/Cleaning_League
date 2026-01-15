@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import authService from '../services/auth';
 import api from '../services/api';
 import logoImg from '../assets/Logo CL.png';
@@ -8,7 +8,6 @@ import defaultavatar from '../assets/avatardefault.jpg';
 
 
 function Menubar() {
-  const navigate = useNavigate();
   const location = useLocation();
   const [user, setUser] = useState(authService.getCurrentUser());
   const [avatarUrl, setAvatarUrl] = useState(null);
@@ -42,7 +41,6 @@ function Menubar() {
     authService.logout();
     window.location.href = '/login'; // Usa href per pulire tutto
   };
-  const isActive = (path) => location.pathname === path ? 'text-info fw-bold' : 'text-light opacity-75';
 
   const menuTextStyle = {
     color: '#fab1a0',     

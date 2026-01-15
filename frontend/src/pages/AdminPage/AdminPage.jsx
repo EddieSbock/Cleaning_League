@@ -23,14 +23,16 @@ const AdminPage = () => {
 
     // carimaneto iniziale
     useEffect(() => {
-        const initData = async () => {
-            const myHouseId = await checkAdminStatus();
-            if (myHouseId) {
-            await fetchSessionStatus(myHouseId);
-            }
-        };
-        initData();
+        checkAdminStatus();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    useEffect(() => {
+        if (houseId) {
+            fetchSessionStatus(houseId);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [houseId]);
 
     const parseJwt = (token) => {
         try {
