@@ -1,4 +1,3 @@
-/* Dashboard.css - Cyberpunk Style */
 
 .dashboard-container {
     display: flex;
@@ -64,7 +63,6 @@
 
 .member-item:hover { background: rgba(255,255,255,0.05); }
 
-/* Stile speciale per ME STESSO */
 .member-item.is-me {
     background: rgba(0, 255, 245, 0.1);
     border: 1px solid rgba(0, 255, 245, 0.3);
@@ -77,7 +75,7 @@
     margin-left: 5px;
 }
 
-/* AVATAR STYLES */
+
 .avatar-img {
     width: 40px;
     height: 40px;
@@ -115,7 +113,7 @@
     padding-top: 20px;
 }
 
-/* TASTO ABBANDONA (Nuovo Stile) */
+
 .btn-leave-house {
     width: 100%;
     background: #2b0000;
@@ -137,7 +135,6 @@
 }
 
 
-/* MAIN CONTENT */
 .main-content {
     flex: 1;
     padding: 30px;
@@ -176,14 +173,14 @@
 .timer-label { display: block; font-size: 0.7rem; color: #e94560; letter-spacing: 1px; }
 .timer-digits { font-size: 1.8rem; font-weight: bold; color: white; font-family: monospace; }
 
-/* GRID LAYOUT */
+
 .dashboard-grid {
     display: grid;
     grid-template-columns: 2fr 1fr; /* 2/3 Task, 1/3 Classifica */
     gap: 30px;
 }
 
-/* TASKS COLUMN */
+
 .section-title {
     display: flex;
     justify-content: space-between;
@@ -261,7 +258,7 @@
     border-radius: 10px 10px 0 0;
 }
 
-/* Immagini Avatar nel Podio */
+/* Immagini Avatar nel podio */
 .podium-place .avatar-img {
     width: 50px; height: 50px; border: 2px solid white; z-index: 2; margin-right: 0;
 }
@@ -297,9 +294,9 @@
     color: #555;
 }
 
-/* --- SEZIONE VOTAZIONI --- */
+/* Sezione per votazione */
 
-/* Contenitore principale lista */
+
 .voting-list-section {
     max-width: 800px;
     margin: 0 auto;
@@ -308,7 +305,7 @@
 
 /* Card della singola Task */
 .voting-card {
-    background-color: #1a1a2e; /* Sfondo scuro leggermente diverso dal main */
+    background-color: #1a1a2e; 
     border: 1px solid #333;
     border-radius: 12px;
     margin-bottom: 15px;
@@ -321,7 +318,7 @@
     border-color: #555;
 }
 
-/* Header della Card (Sempre visibile) */
+
 .voting-header {
     display: flex;
     justify-content: space-between;
@@ -335,7 +332,7 @@
     background-color: rgba(255,255,255,0.05);
 }
 
-/* Info Utente e Task nell'Header */
+
 .v-info {
     display: flex;
     align-items: center;
@@ -343,7 +340,7 @@
 }
 
 .v-user {
-    color: #4cc9f0; /* Azzurro neon */
+    color: #4cc9f0; 
     font-weight: bold;
     font-size: 1.1rem;
 }
@@ -357,7 +354,6 @@
     color: #fff;
 }
 
-/* Statistiche a destra (Stelle e Toggle) */
 .v-stats {
     display: flex;
     align-items: center;
@@ -365,7 +361,7 @@
 }
 
 .v-stars {
-    color: #ffd700; /* Oro */
+    color: #ffd700; 
     font-weight: bold;
     font-size: 1.1rem;
     text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
@@ -391,7 +387,6 @@
     background: #444;
 }
 
-/* Dettagli Espandibili (Commenti e Form) */
 .voting-details {
     border-top: 1px solid #333;
     background-color: #161625;

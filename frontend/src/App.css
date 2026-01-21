@@ -32,7 +32,7 @@ body::before {
 
 
 .card {
-  border: none !important; /* Via il bordo grigio triste di Bootstrap */
+  border: none !important; 
   border-radius: 15px !important;
   box-shadow: 0 10px 20px rgba(0,0,0,0.05); /* Ombra morbida */
   transition: transform 0.3s ease, box-shadow 0.3s ease;

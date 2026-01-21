@@ -143,12 +143,10 @@ const AdminPage = () => {
     const handleStopSession = async () => {
         if (!activeSession) return;
         
-        // Chiediamo conferma per sicurezza
         const confirm = window.confirm("Sei sicuro di voler terminare la sessione in anticipo?");
         if (!confirm) return;
 
         try {
-            // Usiamo PATCH per modificare solo il campo is_active
             await api.patch(`sessions/${activeSession.id}/`, {
                 is_active: false
             });

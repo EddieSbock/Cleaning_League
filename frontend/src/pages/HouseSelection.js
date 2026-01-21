@@ -56,11 +56,11 @@ function HouseSelection() {
         
         {error && <div className="error-msg">{error}</div>}
 
-        {/* VISTA INIZIALE */}
+        
         {mode === 'initial' && (
           <div className="options-grid">
             
-            {/* Bottone Unisciti */}
+            {/* Bottone per unirsi ad una casa */}
             <div className="big-option-btn btn-join" onClick={() => setMode('join')}>
                 <div>
                     <h3>Entra con Codice</h3>
@@ -69,7 +69,7 @@ function HouseSelection() {
                 <span style={{fontSize: '2rem'}}>🎟️</span>
             </div>
             
-            {/* Bottone Crea */}
+            {/* Bottone per creare una casa */}
             <div className="big-option-btn btn-create" onClick={() => setMode('create')}>
                 <div>
                     <h3>Crea Nuova Casa</h3>

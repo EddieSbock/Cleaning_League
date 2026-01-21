@@ -17,7 +17,7 @@ function HomePage() {
     fontWeight: '800',
     textTransform: 'uppercase',
     letterSpacing: '3px',
-    color: '#eac66eff',          // Oro
+    color: '#eac66eff',      
     textShadow: '0 0 15px #800000, 2px 2px 0px #000' // Ombra rossa + contorno nero
   };
 

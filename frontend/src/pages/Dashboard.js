@@ -80,17 +80,15 @@ const Dashboard = () => {
       }
   };
 
-  // NUOVO: Controlla se siamo in gioco o ai voti
+  // Check per stato sessione 
   const checkSessionStatus = (currentSession) => {
       const now = new Date();
       const end = new Date(currentSession.end_time);
       
       if (now > end) {
-          // Sessione Scaduta -> Modalità VOTO
           setMode('VOTING');
           refreshVotingData();
       } else {
-          // Sessione Attiva -> Modalità GIOCO
           setMode('GAME');
           refreshMyTasks(currentSession.id);
       }
@@ -107,7 +105,7 @@ const Dashboard = () => {
       }
   };
 
-  // NUOVO: Scarica dati per votazione
+  // Scarica dati per votazione
   const refreshVotingData = async () => {
       try {
           const res = await api.get('assignments/session_recap/');
@@ -115,7 +113,7 @@ const Dashboard = () => {
       } catch (err) { console.error(err); }
   };
 
-  // 2. TIMER FIX (Aggiornato per cambio modalità)
+  
   useEffect(() => {
     if (mode !== 'GAME' || !session) return;
     
@@ -149,7 +147,7 @@ const Dashboard = () => {
   }, [session, mode]);
 
  
-  // 3. ABBANDONA CASA
+  //  Abbandono casa
   const handleLeaveHouse = async () => {
       const confirm = window.confirm("⚠️ ATTENZIONE: Sei sicuro di voler abbandonare questa casa? Dovrai farti invitare di nuovo per rientrare.");
       if (confirm) {
@@ -165,7 +163,7 @@ const Dashboard = () => {
       }
   };
 
-  // 4. COMPLETAMENTO TASK
+  // Task completata
   const handleCompleteTask = async (assignmentId) => {
     const confirm = window.confirm("Hai davvero completato questa missione?");
     if (!confirm) return;
@@ -178,7 +176,7 @@ const Dashboard = () => {
       
       setMyAssignments(prev => prev.filter(a => a.id !== assignmentId));
 
-      // Aggiorniamo XP localmente (e il livello se volessimo calcolarlo, ma basta l'XP per ora)
+      // Aggiorniamo XP localmente 
       setMembers(prevMembers => prevMembers.map(m => {
           if (String(m.id) === String(myId)) {
               return { ...m, total_xp: m.total_xp + pointsEarned };
@@ -194,7 +192,7 @@ const Dashboard = () => {
     }
   };
 
-  // 5. NUOVO: INVIO VOTO
+  
   const submitVote = async (assignmentId) => {
       try {
           await api.post(`assignments/${assignmentId}/rate/`, {
@@ -290,7 +288,7 @@ const Dashboard = () => {
       {/* CONTENUTO PRINCIPALE */}
       <main className="main-content">
         
-        {/* --- MODALITÀ GIOCO (SESSIONE ATTIVA) --- */}
+        {/* SESSIONE ATTIVA */}
         {mode === 'GAME' && (
             <>
                 <header className="dashboard-header">
@@ -358,7 +356,7 @@ const Dashboard = () => {
             </>
         )}
 
-        {/* --- MODALITÀ VOTAZIONE (SESSIONE TERMINATA) --- */}
+        {/*MODALITÀ VOTAZIONE */}
         {mode === 'VOTING' && (
             <div className="voting-container">
                 <header className="dashboard-header">

@@ -39,7 +39,6 @@
 .task-xp { font-weight: bold; color: #ffd700; float: right; }
 .task-dates { font-size: 0.8rem; color: #aaa; display: block; margin-top: 10px; }
 
-/*CARTA SELEZIONATA (Vola in alto a destra) */
 
 .task-card.active-selection {
     position: fixed;
@@ -53,7 +52,7 @@
     transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Effetto rimbalzo */
 }
 
-/*CARTA ACCETTATA (Vola in basso a destra)*/
+
 .task-card.accepted-anim {
     position: fixed;
     top: auto;
@@ -64,7 +63,7 @@
     transition: all 0.8s ease-in;
 }
 
-/* --- IL MONITOR (Dettagli) --- */
+/* Dettagli monitor */
 .monitor-panel {
     position: fixed;
     top: 80px;

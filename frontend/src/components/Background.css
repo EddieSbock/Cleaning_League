@@ -21,8 +21,8 @@
     background-image: 
         linear-gradient(to right, rgba(233, 69, 96, 0.3) 1px, transparent 1px),
         linear-gradient(to bottom, rgba(233, 69, 96, 0.3) 1px, transparent 1px);
-    background-size: 40px 40px; /* Grandezza quadratini */
-    transform: rotateX(60deg); /* L'inclinazione che crea l'effetto pavimento */
+    background-size: 40px 40px; 
+    transform: rotateX(60deg); 
     animation: grid-move 20s linear infinite; /* Animazione movimento */
     
     /* Sfumatura per far sparire la griglia in lontananza */
@@ -30,7 +30,6 @@
     -webkit-mask-image: linear-gradient(to bottom, transparent 5%, black 40%);
 }
 
-/* Effetto bagliore all'orizzonte */
 .retro-horizon {
     position: absolute;
     top: 0;
